@@ -1,0 +1,24 @@
+g, employee, unknown
+g, manager, employee
+g, boss, manager
+
+p, unknown, /staffer/login, POST
+p, unknown, /enterprise, PUT
+p, unknown, /enterprise, POST
+
+p, employee, /staffer, PUT
+p, employee, /staffer, PATCH
+p, employee, /staffer/password, PUT
+
+p, manager, /staffer/password, DELETE
+p, manager, /staffer, POST
+p, manager, /staffer, GET
+
+p, boss, /workshop, POST
+p, boss, /workshop, PUT
+p, boss, /workshop, PATCH
+p, boss, /workshop, DELETE
+p, boss, /workshop, GET
+p, boss, /enterprise, PUT
+p, boss, /enterprise, PATCH
+p, boss, /enterprise, DELETE

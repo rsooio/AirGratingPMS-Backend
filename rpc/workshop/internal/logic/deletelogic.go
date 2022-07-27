@@ -1,0 +1,28 @@
+package logic
+
+import (
+	"context"
+
+	"air-grating-pms-backend/rpc/workshop/internal/svc"
+	"air-grating-pms-backend/rpc/workshop/types"
+
+	"github.com/zeromicro/go-zero/core/logx"
+)
+
+type DeleteLogic struct {
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+	logx.Logger
+}
+
+func NewDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DeleteLogic {
+	return &DeleteLogic{
+		ctx:    ctx,
+		svcCtx: svcCtx,
+		Logger: logx.WithContext(ctx),
+	}
+}
+
+func (l *DeleteLogic) Delete(in *types.DeleteReq) (*types.Empty, error) {
+	return &types.Empty{}, l.svcCtx.WorkshopModel.Delete(l.ctx, in.GetId())
+}

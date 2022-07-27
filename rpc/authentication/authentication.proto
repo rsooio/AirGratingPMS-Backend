@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package authentication;
+
+option go_package = "./authentication";
+
+message AuthReq {
+    string subject = 1;
+    string object  = 2;
+    string action  = 3;
+}
+
+message AuthResp {
+    bool permission = 1;
+}
+
+service authentication {
+    rpc enforce (AuthReq) returns (AuthResp);
+}

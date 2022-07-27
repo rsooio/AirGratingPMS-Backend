@@ -1,0 +1,29 @@
+Name: organization-api
+Host: 0.0.0.0
+Port: 33012
+AuthRPC:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: authentication.rpc
+EnterpriseRPC:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: enterprise.rpc
+StafferRPC:
+  Etcd:
+    Hosts:
+    - 127.0.0.1:2379
+    Key: staffer.rpc
+Auth:
+  AccessSecret: 72ced10c3b65cb77a57de09b62ad15901d6433d47ae95076282dc8fc3224aaaf
+  AccessExpire: 7200
+Mysql:
+  DataSource: air:@tcp(localhost)/air?charset=utf8mb4&parseTime=true&loc=Asia%2FShanghai
+CacheRedis:
+  - Host: localhost:6379
+    Pass: 
+    Type: node
+DTM:
+  Server: "etcd://localhost:2379/dtmservice"

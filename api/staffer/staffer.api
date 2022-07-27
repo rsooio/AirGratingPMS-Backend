@@ -1,0 +1,146 @@
+syntax = "v1"
+
+info(
+	title: Staffer Module
+	desc: Everything about Staffer
+	author: rsooio
+	email: risin@risin.work
+	version: 1.0
+)
+
+type (
+	LoginReq {
+		Username string `form:"username"`
+		Password string `form:"password"`
+	}
+
+	LoginReply {
+		Id           int64  `json:"id"`
+		Name         string `json:"name"`
+		Gender       string `json:"gender"`
+		Role         string `json:"role"`
+		AccessToken  string `json:"access_token"`
+		AccessExpire int64  `json:"access_expire"`
+	}
+
+	Staffer {
+		Id          int64  `json:"id"`
+		Username    string `json:"username"`
+		Workshop    int64  `json:"workshop"`
+		Role        string `json:"role"`
+		Gender      string `json:"gender"`
+		PhoneNumber string `json:"phone_number"`
+		Email       string `json:"email"`
+		Address     string `json:"address"`
+		Remark      string `json:"remark"`
+	}
+
+	CreateStafferReq {
+		Username    string `json:"username"`
+		Workshop    int64  `json:"workshop"`
+		Role        string `json:"role,options=employee|manager"`
+		Gender      string `json:"gender,options=male|female"`
+		PhoneNumber string `json:"phone_number"`
+		Email       string `json:"email"`
+		Address     string `json:"address"`
+		Remark      string `json:"remark"`
+	}
+
+	ChangeStafferInfoReq {
+		Id          int64  `json:"id"`
+		Username    string `json:"username"`
+		Workshop    int64  `json:"workshop"`
+		Role        string `json:"role,options=employee|manager"`
+		Gender      string `json:"gender,optional,options=male|female"`
+		PhoneNumber string `json:"phone_number,optional"`
+		Email       string `json:"email,optional"`
+		Address     string `json:"address,optional"`
+		Remark      string `json:"remark,optional"`
+	}
+
+	PartialChangeStafferInfoReq {
+		Id          int64  `json:"id"`
+		Username    string `json:"username,optional"`
+		Workshop    int64  `json:"workshop,optional"`
+		Role        string `json:"role,optional,options=employee|manager"`
+		Gender      string `json:"gender,optional,options=male|female"`
+		PhoneNumber string `json:"phone_number,optional"`
+		Email       string `json:"email,optional"`
+		Address     string `json:"address,optional"`
+		Remark      string `json:"remark,optional"`
+	}
+
+	CreateReply {
+		Message  string `json:"message"`
+		Password string `json:"password"`
+	}
+
+	ChangeStafferInfoReply {
+		Message string `json:"message"`
+	}
+
+	PartialChangeStafferInfoReply {
+		Message       string   `json:"message"`
+		ChangedFields []string `json:"changed_fields"`
+	}
+
+	GetStafferListReq {
+		PageNumber int `form:"page_number,default=1"`
+		PageSize   int `form:"page_size,default=20"`
+	}
+
+	GetStafferListReply {
+		Message     string    `json:"message"`
+		StafferList []Staffer `json:"staffer_list"`
+	}
+
+	ChangeStafferPasswordReq {
+		OldPassword string `form:"old_password"`
+		NewPassword string `form:"new_password"`
+	}
+
+	ChangeStafferPasswordReply {
+		Message string `json:"message"`
+	}
+
+	ResetStafferPasswordReq {
+		Id int64 `form:"id"`
+	}
+
+	ResetStafferPasswordReply {
+		Message  string `json:"message"`
+		Password string `json:"password"`
+	}
+)
+
+@server(
+	group: staffer
+)
+service staffer-api {
+	@handler login
+	post /staffer/login (LoginReq) returns(LoginReply)
+}
+
+@server(
+	jwt: Auth
+	group: staffer
+)
+service staffer-api {
+	@handler CreateStaffer
+	post /staffer (CreateStafferReq) returns(CreateReply)
+	
+	@handler ChangeStafferInfo
+	put /staffer (ChangeStafferInfoReq) returns(ChangeStafferInfoReply)
+	
+	@handler PartialChangeStafferInfo
+	patch /staffer (PartialChangeStafferInfoReq) returns(PartialChangeStafferInfoReply)
+	
+	@handler GetStafferList
+	get /staffer (GetStafferListReq) returns(GetStafferListReply)
+	
+	@handler ChangeStafferPassword
+	put /staffer/password (ChangeStafferPasswordReq) returns(ChangeStafferPasswordReply)
+	
+	@handler ResetStafferPassword
+	delete /staffer/password (ResetStafferPasswordReq) returns(ResetStafferPasswordReply)
+}

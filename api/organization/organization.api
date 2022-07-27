@@ -1,0 +1,171 @@
+syntax = "v1"
+
+info(
+	title: Organization Module
+	desc: Everything about Organization
+	author: rsooio
+	email: risin@risin.work
+	version: 1.0
+)
+
+type (
+	Workshop {
+		Id          int64  `json:"id"`
+		Name        string `json:"name"`
+		Address     string `json:"address"`
+		PhoneNumber string `json:"phone_number"`
+		ManagerId   int64  `json:"manager_id"`
+		Remark      string `json:"remark"`
+	}
+
+	CreateWorkshopReq {
+		Name        string `json:"name"`
+		Address     string `json:"address,optional"`
+		PhoneNumber string `json:"phone_number,optional"`
+		ManagerId   int64  `json:"manager_id,optional"`
+		Remark      string `json:"remark,optional"`
+	}
+
+	CreateWorkshopReply {
+		Message string `json:"message"`
+	}
+
+	ChangeWorkshopInfoReq {
+		Id          int64  `json:"id"`
+		Name        string `json:"name"`
+		Address     string `json:"address"`
+		PhoneNumber string `json:"phone_number"`
+		ManagerId   int64  `json:"manager_id"`
+		Remark      string `json:"remark"`
+	}
+
+	ChangeWorkshopInfoReply {
+		Message string `json:"message"`
+	}
+
+	PartialChangeWorkshopInfoReq {
+		Id          int64  `json:"id"`
+		Name        string `json:"name,optional"`
+		Address     string `json:"address,optional"`
+		PhoneNumber string `json:"phone_number,optional"`
+		ManagerId   int64  `json:"manager_id,optional"`
+		Remark      string `json:"remark,optional"`
+	}
+
+	PartialChangeWorkshopInfoReply {
+		Message       string   `json:"message"`
+		ChangedFields []string `json:"changed_fields"`
+	}
+
+	DeleteWorkshopReq {
+		Id int64 `json:"id"`
+	}
+
+	DeleteWorkshopReply {
+		Message string `json:"message"`
+	}
+
+	RetrieveWorkshopReq {
+		PageNumber int `json:"pn"`
+		PageSize   int `json:"ps"`
+	}
+
+	RetrieveWorkshopReply {
+		Message      string     `json:"message"`
+		WorkshopList []Workshop `json:"workshop_list"`
+	}
+)
+
+@server(
+	jwt: Auth
+	group: workshop
+)
+service organization-api {
+	@handler CreateWorkshop
+	post /workshop (CreateWorkshopReq) returns(CreateWorkshopReply)
+	
+	@handler ChangeWorkshopInfo
+	put /workshop (ChangeWorkshopInfoReq) returns(ChangeWorkshopInfoReply)
+	
+	@handler PartialChangeWorkshopInfo
+	patch /workshop (PartialChangeWorkshopInfoReq) returns(PartialChangeWorkshopInfoReply)
+	
+	@handler DeleteWorkshop
+	delete /workshop (DeleteWorkshopReq) returns(DeleteWorkshopReply)
+	
+	@handler RetrieveWorkshop
+	get /workshop (RetrieveWorkshopReq) returns(RetrieveWorkshopReply)
+}
+
+type (
+	CreateEnterpriseReq {
+		Name     string `json:"name"`
+		BossName string `json:"boss_name"`
+		Password string `json:"boss_password"`
+		Address  string `json:"address,optional"`
+		Remark   string `json:"remark,optional"`
+	}
+
+	CreateEnterpriseReply {
+		Message string `json:"message"`
+	}
+
+	ChangeEnterpriseInfoReq {
+		Name    string `json:"name"`
+		Address string `json:"address"`
+		Remark  string `json:"remark"`
+	}
+
+	ChangeEnterpriseInfoReply {
+		Message string `json:"message"`
+	}
+
+	PartialChangeEnterpriseInfoReq {
+		Name    string `json:"name,optional"`
+		Address string `json:"address,optional"`
+		Remark  string `json:"remark,optional"`
+	}
+
+	PartialChangeEnterpriseInfoReply {
+		Message       string   `json:"message"`
+		ChangedFields []string `json:"changed_fields"`
+	}
+
+	DeleteEnterpriseReply {
+		Message string `json:"message"`
+	}
+
+	GetEnterpriseIdByNameReq {
+		Name string `form:"name"`
+	}
+
+	GetEnterpriseIdByNameReply {
+		Id int64 `json:"id"`
+	}
+)
+
+@server(
+	jwt: Auth
+	group: enterprise
+)
+service organization-api {
+	@handler ChangeEnterpriseInfo
+	put /enterprise (ChangeEnterpriseInfoReq) returns(ChangeEnterpriseInfoReply)
+	
+	@handler PartialChangeEnterpriseInfo
+	patch /enterprise (PartialChangeEnterpriseInfoReq) returns(PartialChangeEnterpriseInfoReply)
+	
+	@handler DeleteEnterprise
+	delete /enterprise returns(DeleteEnterpriseReply)
+	
+	@handler GetEnterpriseIdByName
+	get /enterprise (GetEnterpriseIdByNameReq) returns(GetEnterpriseIdByNameReply)
+}
+
+@server(
+	group: enterprise
+)
+service organization-api {
+	@handler CreateEnterprise
+	post /enterprise (CreateEnterpriseReq) returns(CreateEnterpriseReply)
+}

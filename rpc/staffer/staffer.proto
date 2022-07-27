@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package staffer;
+option go_package="./pb";
+
+message Empty {}
+
+service staffer {
+    rpc Insert (StafferInfo) returns (InsertResp);
+    rpc Delete (DeleteReq) returns (Empty);
+    rpc Change (StafferInfoWithId) returns (Empty);
+    rpc PartialChange (StafferInfoWithId) returns (Empty);
+    rpc FindOneByName (FindOneByNameReq) returns (StafferInfo);
+    rpc FindListByWorkshop (FindListByWorkshopReq) returns (StafferList);
+    rpc FindListByEnterprise (FindListByEnterpriseReq) returns (StafferList);
+
+    rpc InsertXa (StafferInfo) returns (InsertResp);
+}
+
+message StafferInfo {
+    int64  EnterpriseId   = 1;
+    int64  WorkshopId     = 2;
+    string Username       = 3;
+    string Role           = 4;
+    string Name           = 5;
+    string HashedPassword = 6;
+    string Gender         = 7;
+    string PhoneNumber    = 8;
+    string Email          = 9;
+    string Address        = 10;
+    int64  ExpireTime     = 11;
+    string Remark         = 12;
+    int64  Version        = 13;
+}
+
+message InsertResp {
+    int64 Id = 1;
+}
+
+message DeleteReq {
+    int64 Id = 1;
+}
+
+message StafferInfoWithId {
+    int64  Id             = 1;
+    int64  EnterpriseId   = 2;
+    int64  WorkshopId     = 3;
+    string Username       = 4;
+    string Role           = 5;
+    string Name           = 6;
+    string HashedPassword = 7;
+    string Gender         = 8;
+    string PhoneNumber    = 9;
+    string Email          = 10;
+    string Address        = 11;
+    int64  ExpireTime     = 12;
+    string Remark         = 13;
+    int64  Version        = 14;
+}
+
+message FindOneByNameReq {
+    int64  EnterpriseId = 1;
+    string Username     = 2;
+}
+
+message FindListByWorkshopReq {
+    int64 EnterpriseId = 1;
+    int64 WorkshopId   = 2;
+    int32 PageSize     = 3;
+    int32 PageNumber   = 4;
+}
+
+message FindListByEnterpriseReq {
+    int64 EnterpriseId = 1;
+    int32 PageSize     = 2;
+    int32 PageNumber   = 3;
+}
+
+message StafferList {
+    repeated StafferInfoWithId StafferList = 1;
+}
