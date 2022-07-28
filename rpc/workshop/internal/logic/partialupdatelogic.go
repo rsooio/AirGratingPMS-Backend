@@ -6,26 +6,26 @@ import (
 
 	"air-grating-pms-backend/model/workshop"
 	"air-grating-pms-backend/rpc/workshop/internal/svc"
-	"air-grating-pms-backend/rpc/workshop/types"
+	"air-grating-pms-backend/rpc/workshop/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type PartialChangeLogic struct {
+type PartialUpdateLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewPartialChangeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PartialChangeLogic {
-	return &PartialChangeLogic{
+func NewPartialUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PartialUpdateLogic {
+	return &PartialUpdateLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *PartialChangeLogic) PartialChange(in *types.WorkshopInfoWithId) (*types.Empty, error) {
+func (l *PartialUpdateLogic) PartialUpdate(in *pb.WorkshopInfo) (*pb.Empty, error) {
 	now, err := l.svcCtx.WorkshopModel.FindOne(l.ctx, in.GetId())
 	if err != nil {
 		return nil, err
@@ -71,5 +71,5 @@ func (l *PartialChangeLogic) PartialChange(in *types.WorkshopInfoWithId) (*types
 		out.Version = in.GetVersion()
 	}
 
-	return &types.Empty{}, l.svcCtx.WorkshopModel.Update(l.ctx, &out)
+	return &pb.Empty{}, l.svcCtx.WorkshopModel.Update(l.ctx, &out)
 }

@@ -17,17 +17,19 @@ type (
 	Empty                   = pb.Empty
 	FindListByEnterpriseReq = pb.FindListByEnterpriseReq
 	FindListByWorkshopReq   = pb.FindListByWorkshopReq
+	FindOneByIdReq          = pb.FindOneByIdReq
 	FindOneByNameReq        = pb.FindOneByNameReq
 	InsertResp              = pb.InsertResp
 	StafferInfo             = pb.StafferInfo
-	StafferInfoWithId       = pb.StafferInfoWithId
 	StafferList             = pb.StafferList
 
 	Staffer interface {
 		Insert(ctx context.Context, in *StafferInfo, opts ...grpc.CallOption) (*InsertResp, error)
 		Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*Empty, error)
-		Change(ctx context.Context, in *StafferInfoWithId, opts ...grpc.CallOption) (*Empty, error)
-		PartialChange(ctx context.Context, in *StafferInfoWithId, opts ...grpc.CallOption) (*Empty, error)
+		Update(ctx context.Context, in *StafferInfo, opts ...grpc.CallOption) (*Empty, error)
+		CustomUpdate(ctx context.Context, in *StafferInfo, opts ...grpc.CallOption) (*Empty, error)
+		PartialUpdate(ctx context.Context, in *StafferInfo, opts ...grpc.CallOption) (*Empty, error)
+		FindOneById(ctx context.Context, in *FindOneByIdReq, opts ...grpc.CallOption) (*StafferInfo, error)
 		FindOneByName(ctx context.Context, in *FindOneByNameReq, opts ...grpc.CallOption) (*StafferInfo, error)
 		FindListByWorkshop(ctx context.Context, in *FindListByWorkshopReq, opts ...grpc.CallOption) (*StafferList, error)
 		FindListByEnterprise(ctx context.Context, in *FindListByEnterpriseReq, opts ...grpc.CallOption) (*StafferList, error)
@@ -55,14 +57,24 @@ func (m *defaultStaffer) Delete(ctx context.Context, in *DeleteReq, opts ...grpc
 	return client.Delete(ctx, in, opts...)
 }
 
-func (m *defaultStaffer) Change(ctx context.Context, in *StafferInfoWithId, opts ...grpc.CallOption) (*Empty, error) {
+func (m *defaultStaffer) Update(ctx context.Context, in *StafferInfo, opts ...grpc.CallOption) (*Empty, error) {
 	client := pb.NewStafferClient(m.cli.Conn())
-	return client.Change(ctx, in, opts...)
+	return client.Update(ctx, in, opts...)
 }
 
-func (m *defaultStaffer) PartialChange(ctx context.Context, in *StafferInfoWithId, opts ...grpc.CallOption) (*Empty, error) {
+func (m *defaultStaffer) CustomUpdate(ctx context.Context, in *StafferInfo, opts ...grpc.CallOption) (*Empty, error) {
 	client := pb.NewStafferClient(m.cli.Conn())
-	return client.PartialChange(ctx, in, opts...)
+	return client.CustomUpdate(ctx, in, opts...)
+}
+
+func (m *defaultStaffer) PartialUpdate(ctx context.Context, in *StafferInfo, opts ...grpc.CallOption) (*Empty, error) {
+	client := pb.NewStafferClient(m.cli.Conn())
+	return client.PartialUpdate(ctx, in, opts...)
+}
+
+func (m *defaultStaffer) FindOneById(ctx context.Context, in *FindOneByIdReq, opts ...grpc.CallOption) (*StafferInfo, error) {
+	client := pb.NewStafferClient(m.cli.Conn())
+	return client.FindOneById(ctx, in, opts...)
 }
 
 func (m *defaultStaffer) FindOneByName(ctx context.Context, in *FindOneByNameReq, opts ...grpc.CallOption) (*StafferInfo, error) {

@@ -23,7 +23,7 @@ CREATE TABLE `order` (
     `start_production_time` TIMESTAMP,
     `production_time` TIMESTAMP,
     `delivery_time` TIMESTAMP,
-    `payment_tiem` TIMESTAMP,
+    `payment_time` TIMESTAMP,
     `corresponding_code` VARCHAR(50),
     `create_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     `update_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

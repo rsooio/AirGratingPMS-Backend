@@ -8,18 +8,19 @@ message Empty {}
 service enterprise {
     rpc Insert (EnterpriseInfo) returns (InsertResp);
     rpc Delete (DeleteReq) returns (Empty);
-    rpc Change (EnterpriseInfoWithId) returns (Empty);
-    rpc PartialChange (EnterpriseInfoWithId) returns (Empty);
+    rpc Update (EnterpriseInfo) returns (Empty);
+    rpc PartialUpdate (EnterpriseInfo) returns (Empty);
     rpc FindOneByName (FindOneByNameReq) returns (EnterpriseInfo);
 
     rpc InsertXa (EnterpriseInfo) returns (InsertResp);
 }
 
 message EnterpriseInfo {
-    string Name    = 2;
-    string Address = 3;
-    string Remark  = 4;
-    int64  Version = 5;
+    int64  Id      = 1;
+    string Name    = 3;
+    string Address = 4;
+    string Remark  = 5;
+    int64  Version = 6;
 }
 
 message InsertResp {
@@ -28,15 +29,6 @@ message InsertResp {
 
 message DeleteReq {
     int64 id = 1;
-}
-
-message EnterpriseInfoWithId {
-    int64  Id      = 1;
-    string Name    = 3;
-    string Address = 4;
-    string Remark  = 5;
-    int64  Version = 6;
-    
 }
 
 message FindOneByNameReq {

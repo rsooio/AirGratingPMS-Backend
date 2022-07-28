@@ -6,25 +6,24 @@ package workshop
 import (
 	"context"
 
-	"air-grating-pms-backend/rpc/workshop/types"
+	"air-grating-pms-backend/rpc/workshop/pb"
 
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
 )
 
 type (
-	DeleteReq               = types.DeleteReq
-	Empty                   = types.Empty
-	FindListByEnterpriseReq = types.FindListByEnterpriseReq
-	WorkshopInfo            = types.WorkshopInfo
-	WorkshopInfoWithId      = types.WorkshopInfoWithId
-	WorkshopList            = types.WorkshopList
+	DeleteReq               = pb.DeleteReq
+	Empty                   = pb.Empty
+	FindListByEnterpriseReq = pb.FindListByEnterpriseReq
+	WorkshopInfo            = pb.WorkshopInfo
+	WorkshopList            = pb.WorkshopList
 
 	Workshop interface {
 		Insert(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error)
 		Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*Empty, error)
-		Change(ctx context.Context, in *WorkshopInfoWithId, opts ...grpc.CallOption) (*Empty, error)
-		PartialChange(ctx context.Context, in *WorkshopInfoWithId, opts ...grpc.CallOption) (*Empty, error)
+		Update(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error)
+		PartialUpdate(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error)
 		FindListByEnterprise(ctx context.Context, in *FindListByEnterpriseReq, opts ...grpc.CallOption) (*WorkshopList, error)
 	}
 
@@ -40,26 +39,26 @@ func NewWorkshop(cli zrpc.Client) Workshop {
 }
 
 func (m *defaultWorkshop) Insert(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error) {
-	client := types.NewWorkshopClient(m.cli.Conn())
+	client := pb.NewWorkshopClient(m.cli.Conn())
 	return client.Insert(ctx, in, opts...)
 }
 
 func (m *defaultWorkshop) Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*Empty, error) {
-	client := types.NewWorkshopClient(m.cli.Conn())
+	client := pb.NewWorkshopClient(m.cli.Conn())
 	return client.Delete(ctx, in, opts...)
 }
 
-func (m *defaultWorkshop) Change(ctx context.Context, in *WorkshopInfoWithId, opts ...grpc.CallOption) (*Empty, error) {
-	client := types.NewWorkshopClient(m.cli.Conn())
-	return client.Change(ctx, in, opts...)
+func (m *defaultWorkshop) Update(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error) {
+	client := pb.NewWorkshopClient(m.cli.Conn())
+	return client.Update(ctx, in, opts...)
 }
 
-func (m *defaultWorkshop) PartialChange(ctx context.Context, in *WorkshopInfoWithId, opts ...grpc.CallOption) (*Empty, error) {
-	client := types.NewWorkshopClient(m.cli.Conn())
-	return client.PartialChange(ctx, in, opts...)
+func (m *defaultWorkshop) PartialUpdate(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error) {
+	client := pb.NewWorkshopClient(m.cli.Conn())
+	return client.PartialUpdate(ctx, in, opts...)
 }
 
 func (m *defaultWorkshop) FindListByEnterprise(ctx context.Context, in *FindListByEnterpriseReq, opts ...grpc.CallOption) (*WorkshopList, error) {
-	client := types.NewWorkshopClient(m.cli.Conn())
+	client := pb.NewWorkshopClient(m.cli.Conn())
 	return client.FindListByEnterprise(ctx, in, opts...)
 }

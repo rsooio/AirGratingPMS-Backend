@@ -2,21 +2,28 @@ package staffer
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"strings"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"github.com/zeromicro/go-zero/core/stringx"
 )
 
 var _ StafferModel = (*customStafferModel)(nil)
+
+var (
+	stafferRowsWithPlaceHolderWithoutPWD = strings.Join(stringx.Remove(stafferFieldNames, "`id`", "enterprise_id", "`hashed_password`", "`create_time`", "`update_time`", "expire_time", "version"), "=?,") + "=?"
+)
 
 type (
 	// StafferModel is an interface to be customized, add more methods here,
 	// and implement the added methods in customStafferModel.
 	StafferModel interface {
 		stafferModel
+		CustomUpdate(ctx context.Context, data *Staffer) error
 		FindListByEnterprise(ctx context.Context, enterpriseId int64, offset, limit int32) ([]*Staffer, error)
 		FindListByWorkshop(ctx context.Context, enterpriseId int64, workshopId int64, offset, limit int32) ([]*Staffer, error)
 	}
@@ -35,6 +42,16 @@ func NewStafferModel(conn sqlx.SqlConn, c cache.CacheConf) StafferModel {
 
 func stafferRowsWithPrefix(prefix string) string {
 	return prefix + "." + strings.Join(stafferFieldNames, ","+prefix+".")
+}
+
+func (m *customStafferModel) CustomUpdate(ctx context.Context, data *Staffer) error {
+	stafferEnterpriseIdUsernameKey := fmt.Sprintf("%s%v:%v", cacheStafferEnterpriseIdUsernamePrefix, data.EnterpriseId, data.Username)
+	stafferIdKey := fmt.Sprintf("%s%v", cacheStafferIdPrefix, data.Id)
+	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, stafferRowsWithPlaceHolderWithoutPWD)
+		return conn.ExecCtx(ctx, query, data.WorkshopId, data.Username, data.Role, data.Name, data.Gender, data.PhoneNumber, data.Email, data.Address, data.Remark, data.Id)
+	}, stafferEnterpriseIdUsernameKey, stafferIdKey)
+	return err
 }
 
 func (m *customStafferModel) FindListByEnterprise(ctx context.Context, enterpriseId int64, offset, limit int32) ([]*Staffer, error) {

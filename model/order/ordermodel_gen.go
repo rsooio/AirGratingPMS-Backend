@@ -53,7 +53,7 @@ type (
 		StartProductionTime sql.NullTime   `db:"start_production_time"`
 		ProductionTime      sql.NullTime   `db:"production_time"`
 		DeliveryTime        sql.NullTime   `db:"delivery_time"`
-		PaymentTiem         sql.NullTime   `db:"payment_tiem"`
+		PaymentTime         sql.NullTime   `db:"payment_time"`
 		CorrespondingCode   sql.NullString `db:"corresponding_code"`
 		CreateTime          time.Time      `db:"create_time"`
 		UpdateTime          time.Time      `db:"update_time"`
@@ -73,7 +73,7 @@ func (m *defaultOrderModel) Insert(ctx context.Context, data *Order) (sql.Result
 	orderIdKey := fmt.Sprintf("%s%v", cacheOrderIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, orderRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.ClientId, data.ProductionPlanId, data.State, data.Address, data.Linkman, data.PhoneNumber, data.Email, data.OrderTime, data.StartProductionTime, data.ProductionTime, data.DeliveryTime, data.PaymentTiem, data.CorrespondingCode, data.Remark, data.Version)
+		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.ClientId, data.ProductionPlanId, data.State, data.Address, data.Linkman, data.PhoneNumber, data.Email, data.OrderTime, data.StartProductionTime, data.ProductionTime, data.DeliveryTime, data.PaymentTime, data.CorrespondingCode, data.Remark, data.Version)
 	}, orderIdKey)
 	return ret, err
 }
@@ -99,7 +99,7 @@ func (m *defaultOrderModel) Update(ctx context.Context, data *Order) error {
 	orderIdKey := fmt.Sprintf("%s%v", cacheOrderIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, orderRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.ClientId, data.ProductionPlanId, data.State, data.Address, data.Linkman, data.PhoneNumber, data.Email, data.OrderTime, data.StartProductionTime, data.ProductionTime, data.DeliveryTime, data.PaymentTiem, data.CorrespondingCode, data.Remark, data.Version, data.Id)
+		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.ClientId, data.ProductionPlanId, data.State, data.Address, data.Linkman, data.PhoneNumber, data.Email, data.OrderTime, data.StartProductionTime, data.ProductionTime, data.DeliveryTime, data.PaymentTime, data.CorrespondingCode, data.Remark, data.Version, data.Id)
 	}, orderIdKey)
 	return err
 }

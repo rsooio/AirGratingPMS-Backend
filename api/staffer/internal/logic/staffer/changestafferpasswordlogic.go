@@ -2,9 +2,13 @@ package staffer
 
 import (
 	"context"
+	"errors"
 
 	"air-grating-pms-backend/api/staffer/internal/svc"
 	"air-grating-pms-backend/api/staffer/internal/types"
+	"air-grating-pms-backend/rpc/staffer/pb"
+	"air-grating-pms-backend/utils"
+	"air-grating-pms-backend/utils/bcrypt"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +28,30 @@ func NewChangeStafferPasswordLogic(ctx context.Context, svcCtx *svc.ServiceConte
 }
 
 func (l *ChangeStafferPasswordLogic) ChangeStafferPassword(req *types.ChangeStafferPasswordReq) (resp *types.ChangeStafferPasswordReply, err error) {
-	// todo: add your logic here and delete this line
+	uid := utils.GetStafferId(l.ctx)
 
-	return
+	info, err := l.svcCtx.StafferRPC.FindOneById(l.ctx, &pb.FindOneByIdReq{
+		Id: uid,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if !bcrypt.Verify(info.HashedPassword, req.OldPassword) {
+		return nil, errors.New("incorrect password")
+	}
+
+	hashedPassword, err := bcrypt.Encrypt(req.NewPassword)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = l.svcCtx.StafferRPC.PartialUpdate(l.ctx, &pb.StafferInfo{
+		Id:             uid,
+		HashedPassword: hashedPassword,
+	})
+
+	return &types.ChangeStafferPasswordReply{
+		Message: "OK",
+	}, err
 }

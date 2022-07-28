@@ -44,6 +44,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: staffer.GetStafferListHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodGet,
+				Path:    "/workshop/staffer",
+				Handler: staffer.GetStafferListByWorkshopHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodPut,
 				Path:    "/staffer/password",
 				Handler: staffer.ChangeStafferPasswordHandler(serverCtx),

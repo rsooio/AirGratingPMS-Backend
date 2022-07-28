@@ -2,8 +2,9 @@
 package types
 
 type LoginReq struct {
-	Username string `form:"username"`
-	Password string `form:"password"`
+	EnterpriseId int64  `form:"enterprise_id"`
+	Username     string `form:"username"`
+	Password     string `form:"password"`
 }
 
 type LoginReply struct {
@@ -18,7 +19,8 @@ type LoginReply struct {
 type Staffer struct {
 	Id          int64  `json:"id"`
 	Username    string `json:"username"`
-	Workshop    int64  `json:"workshop"`
+	WorkshopId  int64  `json:"workshop_id"`
+	Name        string `json:"name"`
 	Role        string `json:"role"`
 	Gender      string `json:"gender"`
 	PhoneNumber string `json:"phone_number"`
@@ -29,7 +31,8 @@ type Staffer struct {
 
 type CreateStafferReq struct {
 	Username    string `json:"username"`
-	Workshop    int64  `json:"workshop"`
+	WorkshopId  int64  `json:"workshop_id"`
+	Name        string `json:"name"`
 	Role        string `json:"role,options=employee|manager"`
 	Gender      string `json:"gender,options=male|female"`
 	PhoneNumber string `json:"phone_number"`
@@ -41,7 +44,8 @@ type CreateStafferReq struct {
 type ChangeStafferInfoReq struct {
 	Id          int64  `json:"id"`
 	Username    string `json:"username"`
-	Workshop    int64  `json:"workshop"`
+	WorkshopId  int64  `json:"workshop_id"`
+	Name        string `json:"name"`
 	Role        string `json:"role,options=employee|manager"`
 	Gender      string `json:"gender,optional,options=male|female"`
 	PhoneNumber string `json:"phone_number,optional"`
@@ -53,7 +57,8 @@ type ChangeStafferInfoReq struct {
 type PartialChangeStafferInfoReq struct {
 	Id          int64  `json:"id"`
 	Username    string `json:"username,optional"`
-	Workshop    int64  `json:"workshop,optional"`
+	WorkshopId  int64  `json:"workshop_id,optional"`
+	Name        string `json:"name"`
 	Role        string `json:"role,optional,options=employee|manager"`
 	Gender      string `json:"gender,optional,options=male|female"`
 	PhoneNumber string `json:"phone_number,optional"`
@@ -77,11 +82,22 @@ type PartialChangeStafferInfoReply struct {
 }
 
 type GetStafferListReq struct {
-	PageNumber int `form:"page_number,default=1"`
-	PageSize   int `form:"page_size,default=20"`
+	PageNumber int32 `form:"page_number,default=1"`
+	PageSize   int32 `form:"page_size,default=20"`
 }
 
 type GetStafferListReply struct {
+	Message     string    `json:"message"`
+	StafferList []Staffer `json:"staffer_list"`
+}
+
+type GetStafferListByWorkshopReq struct {
+	WorkshopId int64 `form:"workshop_id"`
+	PageNumber int32 `form:"page_number,default=1"`
+	PageSize   int32 `form:"page_size,default=20"`
+}
+
+type GetStafferListByWorkshopReply struct {
 	Message     string    `json:"message"`
 	StafferList []Staffer `json:"staffer_list"`
 }

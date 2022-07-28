@@ -5,6 +5,7 @@ import (
 
 	"air-grating-pms-backend/api/organization/internal/svc"
 	"air-grating-pms-backend/api/organization/internal/types"
+	"air-grating-pms-backend/rpc/workshop/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +25,9 @@ func NewDeleteWorkshopLogic(ctx context.Context, svcCtx *svc.ServiceContext) *De
 }
 
 func (l *DeleteWorkshopLogic) DeleteWorkshop(req *types.DeleteWorkshopReq) (resp *types.DeleteWorkshopReply, err error) {
-	// todo: add your logic here and delete this line
+	_, err = l.svcCtx.WorkshopRPC.Delete(l.ctx, &pb.DeleteReq{Id: req.Id})
 
-	return
+	return &types.DeleteWorkshopReply{
+		Message: "OK",
+	}, err
 }

@@ -9,8 +9,10 @@ import (
 type Config struct {
 	rest.RestConf
 
-	AuthRpc    zrpc.RpcClientConf
-	CacheRedis cache.CacheConf
+	DefaultPassword string
+	AuthRPC         zrpc.RpcClientConf
+	StafferRPC      zrpc.RpcClientConf
+	CacheRedis      cache.CacheConf
 
 	Auth struct {
 		AccessSecret string

@@ -25,7 +25,7 @@ func main() {
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()
 
-	server.Use(middleware.AuthenticationMiddleware(&c.AuthRpc))
+	server.Use(middleware.AuthenticationMiddleware(&c.AuthRPC))
 	handler.RegisterHandlers(server, ctx)
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)

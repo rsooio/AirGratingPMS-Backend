@@ -1,11 +1,17 @@
 Name: staffer-api
 Host: 0.0.0.0
 Port: 33011
-AuthRpc:
+DefaultPassword: 88888888
+AuthRPC:
   Etcd:
     Hosts:
       - 127.0.0.1:2379
     Key: authentication.rpc
+StafferRPC:
+  Etcd:
+    Hosts:
+    - 127.0.0.1:2379
+    Key: staffer.rpc
 Auth:
   AccessSecret: 72ced10c3b65cb77a57de09b62ad15901d6433d47ae95076282dc8fc3224aaaf
   AccessExpire: 7200

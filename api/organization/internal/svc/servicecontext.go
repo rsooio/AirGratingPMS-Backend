@@ -2,59 +2,35 @@ package svc
 
 import (
 	"air-grating-pms-backend/api/organization/internal/config"
-	"air-grating-pms-backend/model/enterprise"
-	"air-grating-pms-backend/model/staffer"
-	"air-grating-pms-backend/model/workshop"
+	epb "air-grating-pms-backend/rpc/enterprise/pb"
+	spb "air-grating-pms-backend/rpc/staffer/pb"
+	wpb "air-grating-pms-backend/rpc/workshop/pb"
 
-	"github.com/dtm-labs/dtmgrpc"
-	"github.com/zeromicro/go-zero/core/stores/sqlx"
-)
-
-type (
-	DTM struct {
-		Gid string
-	}
-	RPC struct {
-		Target string
-	}
+	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type ServiceContext struct {
-	Config          config.Config
-	StafferModel    staffer.StafferModel
-	WorkshopModel   workshop.WorkshopModel
-	EnterpriseModel enterprise.EnterpriseModel
-	DTM             DTM
-	EnterpriseRPC   RPC
-	StafferRPC      RPC
+	Config           config.Config
+	StafferRPC       spb.StafferClient
+	WorkshopRPC      wpb.WorkshopClient
+	EnterpriseRPC    epb.EnterpriseClient
+	StafferTarget    string
+	WorkshopTarget   string
+	EnterpriseTarget string
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	conn := sqlx.NewMysql(c.Mysql.DataSource)
-
-	enterpriseTarget, err := c.EnterpriseRPC.BuildTarget()
-	if err != nil {
-		panic(err)
-	}
-
-	stafferTarget, err := c.StafferRPC.BuildTarget()
-	if err != nil {
-		panic(err)
-	}
+	econn := zrpc.MustNewClient(c.EnterpriseRPC).Conn()
+	wconn := zrpc.MustNewClient(c.WorkshopRPC).Conn()
+	sconn := zrpc.MustNewClient(c.StafferRPC).Conn()
 
 	return &ServiceContext{
-		Config:          c,
-		StafferModel:    staffer.NewStafferModel(conn, c.CacheRedis),
-		WorkshopModel:   workshop.NewWorkshopModel(conn, c.CacheRedis),
-		EnterpriseModel: enterprise.NewEnterpriseModel(conn, c.CacheRedis),
-		DTM: DTM{
-			Gid: dtmgrpc.MustGenGid(c.DTM.Server),
-		},
-		EnterpriseRPC: RPC{
-			Target: enterpriseTarget,
-		},
-		StafferRPC: RPC{
-			Target: stafferTarget,
-		},
+		Config:           c,
+		StafferRPC:       spb.NewStafferClient(sconn),
+		WorkshopRPC:      wpb.NewWorkshopClient(wconn),
+		EnterpriseRPC:    epb.NewEnterpriseClient(econn),
+		StafferTarget:    sconn.Target(),
+		EnterpriseTarget: econn.Target(),
+		WorkshopTarget:   wconn.Target(),
 	}
 }

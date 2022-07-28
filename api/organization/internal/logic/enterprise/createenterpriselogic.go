@@ -6,8 +6,8 @@ import (
 	"air-grating-pms-backend/api/organization/internal/svc"
 	"air-grating-pms-backend/api/organization/internal/types"
 	"air-grating-pms-backend/rpc/enterprise/enterprise"
-	enterprisepb "air-grating-pms-backend/rpc/enterprise/pb"
-	stafferpb "air-grating-pms-backend/rpc/staffer/pb"
+	epb "air-grating-pms-backend/rpc/enterprise/pb"
+	spb "air-grating-pms-backend/rpc/staffer/pb"
 	"air-grating-pms-backend/rpc/staffer/staffer"
 	"air-grating-pms-backend/utils/bcrypt"
 
@@ -96,22 +96,22 @@ func (l *CreateEnterpriseLogic) CreateEnterprise(req *types.CreateEnterpriseReq)
 
 	gid := dtmgrpc.MustGenGid(l.svcCtx.Config.DTM.Server)
 	err = dtmgrpc.XaGlobalTransaction("localhost:36790", gid, func(xa *dtmgrpc.XaGrpc) error {
-		r := &enterprisepb.InsertResp{}
-		err := xa.CallBranch(&enterprisepb.EnterpriseInfo{
+		r := &epb.InsertResp{}
+		err := xa.CallBranch(&epb.EnterpriseInfo{
 			Name:    req.Name,
 			Address: req.Address,
 			Remark:  req.Remark,
-		}, l.svcCtx.EnterpriseRPC.Target+enterprise.InsertXaPath, r)
+		}, l.svcCtx.EnterpriseTarget+enterprise.InsertXaPath, r)
 		if err != nil {
 			return err
 		}
 
-		r2 := &stafferpb.InsertResp{}
-		err = xa.CallBranch(&stafferpb.StafferInfo{
+		r2 := &spb.InsertResp{}
+		err = xa.CallBranch(&spb.StafferInfo{
 			EnterpriseId:   r.Id,
 			Username:       req.BossName,
 			HashedPassword: hashedPassword,
-		}, l.svcCtx.StafferRPC.Target+staffer.InsertXaPath, r2)
+		}, l.svcCtx.StafferTarget+staffer.InsertXaPath, r2)
 		return err
 	})
 

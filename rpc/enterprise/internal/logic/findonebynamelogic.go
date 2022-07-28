@@ -30,6 +30,7 @@ func (l *FindOneByNameLogic) FindOneByName(in *pb.FindOneByNameReq) (*pb.Enterpr
 	}
 
 	return &pb.EnterpriseInfo{
+		Id:      info.Id,
 		Name:    info.Name,
 		Address: info.Address.String,
 		Remark:  info.Remark.String,

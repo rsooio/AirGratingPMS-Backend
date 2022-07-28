@@ -13,18 +13,17 @@ import (
 )
 
 type (
-	DeleteReq            = pb.DeleteReq
-	Empty                = pb.Empty
-	EnterpriseInfo       = pb.EnterpriseInfo
-	EnterpriseInfoWithId = pb.EnterpriseInfoWithId
-	FindOneByNameReq     = pb.FindOneByNameReq
-	InsertResp           = pb.InsertResp
+	DeleteReq        = pb.DeleteReq
+	Empty            = pb.Empty
+	EnterpriseInfo   = pb.EnterpriseInfo
+	FindOneByNameReq = pb.FindOneByNameReq
+	InsertResp       = pb.InsertResp
 
 	Enterprise interface {
 		Insert(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*InsertResp, error)
 		Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*Empty, error)
-		Change(ctx context.Context, in *EnterpriseInfoWithId, opts ...grpc.CallOption) (*Empty, error)
-		PartialChange(ctx context.Context, in *EnterpriseInfoWithId, opts ...grpc.CallOption) (*Empty, error)
+		Update(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error)
+		PartialUpdate(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error)
 		FindOneByName(ctx context.Context, in *FindOneByNameReq, opts ...grpc.CallOption) (*EnterpriseInfo, error)
 		InsertXa(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*InsertResp, error)
 	}
@@ -50,14 +49,14 @@ func (m *defaultEnterprise) Delete(ctx context.Context, in *DeleteReq, opts ...g
 	return client.Delete(ctx, in, opts...)
 }
 
-func (m *defaultEnterprise) Change(ctx context.Context, in *EnterpriseInfoWithId, opts ...grpc.CallOption) (*Empty, error) {
+func (m *defaultEnterprise) Update(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error) {
 	client := pb.NewEnterpriseClient(m.cli.Conn())
-	return client.Change(ctx, in, opts...)
+	return client.Update(ctx, in, opts...)
 }
 
-func (m *defaultEnterprise) PartialChange(ctx context.Context, in *EnterpriseInfoWithId, opts ...grpc.CallOption) (*Empty, error) {
+func (m *defaultEnterprise) PartialUpdate(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error) {
 	client := pb.NewEnterpriseClient(m.cli.Conn())
-	return client.PartialChange(ctx, in, opts...)
+	return client.PartialUpdate(ctx, in, opts...)
 }
 
 func (m *defaultEnterprise) FindOneByName(ctx context.Context, in *FindOneByNameReq, opts ...grpc.CallOption) (*EnterpriseInfo, error) {

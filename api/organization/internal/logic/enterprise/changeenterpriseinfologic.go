@@ -5,6 +5,7 @@ import (
 
 	"air-grating-pms-backend/api/organization/internal/svc"
 	"air-grating-pms-backend/api/organization/internal/types"
+	"air-grating-pms-backend/rpc/enterprise/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +25,14 @@ func NewChangeEnterpriseInfoLogic(ctx context.Context, svcCtx *svc.ServiceContex
 }
 
 func (l *ChangeEnterpriseInfoLogic) ChangeEnterpriseInfo(req *types.ChangeEnterpriseInfoReq) (resp *types.ChangeEnterpriseInfoReply, err error) {
-	// todo: add your logic here and delete this line
+	_, err = l.svcCtx.EnterpriseRPC.Update(l.ctx, &pb.EnterpriseInfo{
+		Id:      l.ctx.Value("ent").(int64),
+		Name:    req.Name,
+		Address: req.Address,
+		Remark:  req.Remark,
+	})
 
-	return
+	return &types.ChangeEnterpriseInfoReply{
+		Message: "OK",
+	}, err
 }

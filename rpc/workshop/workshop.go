@@ -7,7 +7,7 @@ import (
 	"air-grating-pms-backend/rpc/workshop/internal/config"
 	"air-grating-pms-backend/rpc/workshop/internal/server"
 	"air-grating-pms-backend/rpc/workshop/internal/svc"
-	"air-grating-pms-backend/rpc/workshop/types"
+	"air-grating-pms-backend/rpc/workshop/pb"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
@@ -27,7 +27,7 @@ func main() {
 	svr := server.NewWorkshopServer(ctx)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
-		types.RegisterWorkshopServer(grpcServer, svr)
+		pb.RegisterWorkshopServer(grpcServer, svr)
 
 		if c.Mode == service.DevMode || c.Mode == service.TestMode {
 			reflection.Register(grpcServer)

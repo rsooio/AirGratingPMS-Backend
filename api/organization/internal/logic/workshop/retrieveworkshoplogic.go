@@ -5,6 +5,9 @@ import (
 
 	"air-grating-pms-backend/api/organization/internal/svc"
 	"air-grating-pms-backend/api/organization/internal/types"
+	convert "air-grating-pms-backend/api/organization/utils"
+	"air-grating-pms-backend/rpc/workshop/pb"
+	"air-grating-pms-backend/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +27,19 @@ func NewRetrieveWorkshopLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *RetrieveWorkshopLogic) RetrieveWorkshop(req *types.RetrieveWorkshopReq) (resp *types.RetrieveWorkshopReply, err error) {
-	// todo: add your logic here and delete this line
+	list, err := l.svcCtx.WorkshopRPC.FindListByEnterprise(l.ctx, &pb.FindListByEnterpriseReq{
+		EnterpriseId: utils.GetEnterpriseId(l.ctx),
+		PageSize:     int32(req.PageSize),
+		PageNumber:   int32(req.PageNumber),
+	})
+	if err != nil {
+		return nil, err
+	}
 
-	return
+	listresp, err := convert.Convert(list)
+
+	return &types.RetrieveWorkshopReply{
+		Message:      "",
+		WorkshopList: *listresp,
+	}, err
 }

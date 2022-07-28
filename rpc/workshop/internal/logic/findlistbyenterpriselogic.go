@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"air-grating-pms-backend/rpc/workshop/internal/svc"
-	"air-grating-pms-backend/rpc/workshop/types"
+	"air-grating-pms-backend/rpc/workshop/pb"
 	"air-grating-pms-backend/rpc/workshop/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -24,7 +24,7 @@ func NewFindListByEnterpriseLogic(ctx context.Context, svcCtx *svc.ServiceContex
 	}
 }
 
-func (l *FindListByEnterpriseLogic) FindListByEnterprise(in *types.FindListByEnterpriseReq) (*types.WorkshopList, error) {
+func (l *FindListByEnterpriseLogic) FindListByEnterprise(in *pb.FindListByEnterpriseReq) (*pb.WorkshopList, error) {
 	list, err := l.svcCtx.WorkshopModel.FindListByEnterprise(l.ctx, in.GetEnterpriseId(), (in.GetPageNumber()-1)*in.GetPageSize(), in.GetPageNumber())
 	if err != nil {
 		return nil, err

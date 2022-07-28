@@ -10,8 +10,9 @@ type Config struct {
 	rest.RestConf
 
 	AuthRPC       zrpc.RpcClientConf
-	EnterpriseRPC zrpc.RpcClientConf
 	StafferRPC    zrpc.RpcClientConf
+	WorkshopRPC   zrpc.RpcClientConf
+	EnterpriseRPC zrpc.RpcClientConf
 	CacheRedis    cache.CacheConf
 
 	Auth struct {

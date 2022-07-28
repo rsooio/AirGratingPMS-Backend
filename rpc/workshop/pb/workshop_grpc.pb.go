@@ -4,7 +4,7 @@
 // - protoc             v3.19.4
 // source: workshop.proto
 
-package types
+package pb
 
 import (
 	context "context"
@@ -24,8 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type WorkshopClient interface {
 	Insert(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error)
 	Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*Empty, error)
-	Change(ctx context.Context, in *WorkshopInfoWithId, opts ...grpc.CallOption) (*Empty, error)
-	PartialChange(ctx context.Context, in *WorkshopInfoWithId, opts ...grpc.CallOption) (*Empty, error)
+	Update(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error)
+	PartialUpdate(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error)
 	FindListByEnterprise(ctx context.Context, in *FindListByEnterpriseReq, opts ...grpc.CallOption) (*WorkshopList, error)
 }
 
@@ -55,18 +55,18 @@ func (c *workshopClient) Delete(ctx context.Context, in *DeleteReq, opts ...grpc
 	return out, nil
 }
 
-func (c *workshopClient) Change(ctx context.Context, in *WorkshopInfoWithId, opts ...grpc.CallOption) (*Empty, error) {
+func (c *workshopClient) Update(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/workshop.workshop/Change", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/workshop.workshop/Update", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *workshopClient) PartialChange(ctx context.Context, in *WorkshopInfoWithId, opts ...grpc.CallOption) (*Empty, error) {
+func (c *workshopClient) PartialUpdate(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/workshop.workshop/PartialChange", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/workshop.workshop/PartialUpdate", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -88,8 +88,8 @@ func (c *workshopClient) FindListByEnterprise(ctx context.Context, in *FindListB
 type WorkshopServer interface {
 	Insert(context.Context, *WorkshopInfo) (*Empty, error)
 	Delete(context.Context, *DeleteReq) (*Empty, error)
-	Change(context.Context, *WorkshopInfoWithId) (*Empty, error)
-	PartialChange(context.Context, *WorkshopInfoWithId) (*Empty, error)
+	Update(context.Context, *WorkshopInfo) (*Empty, error)
+	PartialUpdate(context.Context, *WorkshopInfo) (*Empty, error)
 	FindListByEnterprise(context.Context, *FindListByEnterpriseReq) (*WorkshopList, error)
 	mustEmbedUnimplementedWorkshopServer()
 }
@@ -104,11 +104,11 @@ func (UnimplementedWorkshopServer) Insert(context.Context, *WorkshopInfo) (*Empt
 func (UnimplementedWorkshopServer) Delete(context.Context, *DeleteReq) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedWorkshopServer) Change(context.Context, *WorkshopInfoWithId) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Change not implemented")
+func (UnimplementedWorkshopServer) Update(context.Context, *WorkshopInfo) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedWorkshopServer) PartialChange(context.Context, *WorkshopInfoWithId) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PartialChange not implemented")
+func (UnimplementedWorkshopServer) PartialUpdate(context.Context, *WorkshopInfo) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PartialUpdate not implemented")
 }
 func (UnimplementedWorkshopServer) FindListByEnterprise(context.Context, *FindListByEnterpriseReq) (*WorkshopList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindListByEnterprise not implemented")
@@ -162,38 +162,38 @@ func _Workshop_Delete_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Workshop_Change_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WorkshopInfoWithId)
+func _Workshop_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WorkshopInfo)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(WorkshopServer).Change(ctx, in)
+		return srv.(WorkshopServer).Update(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/workshop.workshop/Change",
+		FullMethod: "/workshop.workshop/Update",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WorkshopServer).Change(ctx, req.(*WorkshopInfoWithId))
+		return srv.(WorkshopServer).Update(ctx, req.(*WorkshopInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Workshop_PartialChange_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WorkshopInfoWithId)
+func _Workshop_PartialUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WorkshopInfo)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(WorkshopServer).PartialChange(ctx, in)
+		return srv.(WorkshopServer).PartialUpdate(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/workshop.workshop/PartialChange",
+		FullMethod: "/workshop.workshop/PartialUpdate",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WorkshopServer).PartialChange(ctx, req.(*WorkshopInfoWithId))
+		return srv.(WorkshopServer).PartialUpdate(ctx, req.(*WorkshopInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -232,12 +232,12 @@ var Workshop_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Workshop_Delete_Handler,
 		},
 		{
-			MethodName: "Change",
-			Handler:    _Workshop_Change_Handler,
+			MethodName: "Update",
+			Handler:    _Workshop_Update_Handler,
 		},
 		{
-			MethodName: "PartialChange",
-			Handler:    _Workshop_PartialChange_Handler,
+			MethodName: "PartialUpdate",
+			Handler:    _Workshop_PartialUpdate_Handler,
 		},
 		{
 			MethodName: "FindListByEnterprise",

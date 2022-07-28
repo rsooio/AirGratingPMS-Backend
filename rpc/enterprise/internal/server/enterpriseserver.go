@@ -32,14 +32,14 @@ func (s *EnterpriseServer) Delete(ctx context.Context, in *pb.DeleteReq) (*pb.Em
 	return l.Delete(in)
 }
 
-func (s *EnterpriseServer) Change(ctx context.Context, in *pb.EnterpriseInfoWithId) (*pb.Empty, error) {
-	l := logic.NewChangeLogic(ctx, s.svcCtx)
-	return l.Change(in)
+func (s *EnterpriseServer) Update(ctx context.Context, in *pb.EnterpriseInfo) (*pb.Empty, error) {
+	l := logic.NewUpdateLogic(ctx, s.svcCtx)
+	return l.Update(in)
 }
 
-func (s *EnterpriseServer) PartialChange(ctx context.Context, in *pb.EnterpriseInfoWithId) (*pb.Empty, error) {
-	l := logic.NewPartialChangeLogic(ctx, s.svcCtx)
-	return l.PartialChange(in)
+func (s *EnterpriseServer) PartialUpdate(ctx context.Context, in *pb.EnterpriseInfo) (*pb.Empty, error) {
+	l := logic.NewPartialUpdateLogic(ctx, s.svcCtx)
+	return l.PartialUpdate(in)
 }
 
 func (s *EnterpriseServer) FindOneByName(ctx context.Context, in *pb.FindOneByNameReq) (*pb.EnterpriseInfo, error) {

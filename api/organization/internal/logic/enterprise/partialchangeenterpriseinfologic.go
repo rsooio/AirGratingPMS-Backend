@@ -5,6 +5,7 @@ import (
 
 	"air-grating-pms-backend/api/organization/internal/svc"
 	"air-grating-pms-backend/api/organization/internal/types"
+	"air-grating-pms-backend/rpc/enterprise/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +25,11 @@ func NewPartialChangeEnterpriseInfoLogic(ctx context.Context, svcCtx *svc.Servic
 }
 
 func (l *PartialChangeEnterpriseInfoLogic) PartialChangeEnterpriseInfo(req *types.PartialChangeEnterpriseInfoReq) (resp *types.PartialChangeEnterpriseInfoReply, err error) {
-	// todo: add your logic here and delete this line
+	l.svcCtx.EnterpriseRPC.PartialUpdate(l.ctx, &pb.EnterpriseInfo{
+		Name:    req.Name,
+		Address: req.Address,
+		Remark:  req.Remark,
+	})
 
 	return
 }

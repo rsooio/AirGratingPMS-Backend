@@ -30,7 +30,7 @@ func (l *FindListByEnterpriseLogic) FindListByEnterprise(in *pb.FindListByEnterp
 		return nil, err
 	}
 
-	resp, err := utils.Convert(list)
+	resp, err := utils.ListConvert(list)
 	if err != nil {
 		return nil, err
 	}

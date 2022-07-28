@@ -12,7 +12,7 @@ p, employee, /staffer/password, PUT
 
 p, manager, /staffer/password, DELETE
 p, manager, /staffer, POST
-p, manager, /staffer, GET
+p, manager, /workshop/staffer, GET
 
 p, boss, /workshop, POST
 p, boss, /workshop, PUT
@@ -22,3 +22,4 @@ p, boss, /workshop, GET
 p, boss, /enterprise, PUT
 p, boss, /enterprise, PATCH
 p, boss, /enterprise, DELETE
+p, boss, /staffer, GET

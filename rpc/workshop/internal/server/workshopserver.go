@@ -8,12 +8,12 @@ import (
 
 	"air-grating-pms-backend/rpc/workshop/internal/logic"
 	"air-grating-pms-backend/rpc/workshop/internal/svc"
-	"air-grating-pms-backend/rpc/workshop/types"
+	"air-grating-pms-backend/rpc/workshop/pb"
 )
 
 type WorkshopServer struct {
 	svcCtx *svc.ServiceContext
-	types.UnimplementedWorkshopServer
+	pb.UnimplementedWorkshopServer
 }
 
 func NewWorkshopServer(svcCtx *svc.ServiceContext) *WorkshopServer {
@@ -22,27 +22,27 @@ func NewWorkshopServer(svcCtx *svc.ServiceContext) *WorkshopServer {
 	}
 }
 
-func (s *WorkshopServer) Insert(ctx context.Context, in *types.WorkshopInfo) (*types.Empty, error) {
+func (s *WorkshopServer) Insert(ctx context.Context, in *pb.WorkshopInfo) (*pb.Empty, error) {
 	l := logic.NewInsertLogic(ctx, s.svcCtx)
 	return l.Insert(in)
 }
 
-func (s *WorkshopServer) Delete(ctx context.Context, in *types.DeleteReq) (*types.Empty, error) {
+func (s *WorkshopServer) Delete(ctx context.Context, in *pb.DeleteReq) (*pb.Empty, error) {
 	l := logic.NewDeleteLogic(ctx, s.svcCtx)
 	return l.Delete(in)
 }
 
-func (s *WorkshopServer) Change(ctx context.Context, in *types.WorkshopInfoWithId) (*types.Empty, error) {
-	l := logic.NewChangeLogic(ctx, s.svcCtx)
-	return l.Change(in)
+func (s *WorkshopServer) Update(ctx context.Context, in *pb.WorkshopInfo) (*pb.Empty, error) {
+	l := logic.NewUpdateLogic(ctx, s.svcCtx)
+	return l.Update(in)
 }
 
-func (s *WorkshopServer) PartialChange(ctx context.Context, in *types.WorkshopInfoWithId) (*types.Empty, error) {
-	l := logic.NewPartialChangeLogic(ctx, s.svcCtx)
-	return l.PartialChange(in)
+func (s *WorkshopServer) PartialUpdate(ctx context.Context, in *pb.WorkshopInfo) (*pb.Empty, error) {
+	l := logic.NewPartialUpdateLogic(ctx, s.svcCtx)
+	return l.PartialUpdate(in)
 }
 
-func (s *WorkshopServer) FindListByEnterprise(ctx context.Context, in *types.FindListByEnterpriseReq) (*types.WorkshopList, error) {
+func (s *WorkshopServer) FindListByEnterprise(ctx context.Context, in *pb.FindListByEnterpriseReq) (*pb.WorkshopList, error) {
 	l := logic.NewFindListByEnterpriseLogic(ctx, s.svcCtx)
 	return l.FindListByEnterprise(in)
 }

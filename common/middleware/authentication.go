@@ -13,25 +13,14 @@ import (
 	"github.com/zeromicro/go-zero/zrpc"
 )
 
-type AuthenticationMiddlewareKey string
-
-var EnterpriseID AuthenticationMiddlewareKey = "eid"
-
 func AuthenticationMiddleware(conf *zrpc.RpcClientConf) rest.Middleware {
 	authRpc := authentication.NewAuthenticationClient(zrpc.MustNewClient(*conf).Conn())
 	fmt.Println("Middleware init")
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			// enterpriseID, err := strconv.Atoi(r.Header.Get("ENTERPRISE_ID"))
-			// if err != nil {
-			// 	httpx.Error(w, err)
-			// 	return
-			// }
-
 			ctx := r.Context()
-			// ctx = context.WithValue(ctx, EnterpriseID, int64(enterpriseID))
 
-			role := ctx.Value("role")
+			role := ctx.Value("rol")
 			if role == nil {
 				role = "unknown"
 			}

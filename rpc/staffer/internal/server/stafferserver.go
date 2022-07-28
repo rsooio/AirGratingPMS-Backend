@@ -32,14 +32,24 @@ func (s *StafferServer) Delete(ctx context.Context, in *pb.DeleteReq) (*pb.Empty
 	return l.Delete(in)
 }
 
-func (s *StafferServer) Change(ctx context.Context, in *pb.StafferInfoWithId) (*pb.Empty, error) {
-	l := logic.NewChangeLogic(ctx, s.svcCtx)
-	return l.Change(in)
+func (s *StafferServer) Update(ctx context.Context, in *pb.StafferInfo) (*pb.Empty, error) {
+	l := logic.NewUpdateLogic(ctx, s.svcCtx)
+	return l.Update(in)
 }
 
-func (s *StafferServer) PartialChange(ctx context.Context, in *pb.StafferInfoWithId) (*pb.Empty, error) {
-	l := logic.NewPartialChangeLogic(ctx, s.svcCtx)
-	return l.PartialChange(in)
+func (s *StafferServer) CustomUpdate(ctx context.Context, in *pb.StafferInfo) (*pb.Empty, error) {
+	l := logic.NewCustomUpdateLogic(ctx, s.svcCtx)
+	return l.CustomUpdate(in)
+}
+
+func (s *StafferServer) PartialUpdate(ctx context.Context, in *pb.StafferInfo) (*pb.Empty, error) {
+	l := logic.NewPartialUpdateLogic(ctx, s.svcCtx)
+	return l.PartialUpdate(in)
+}
+
+func (s *StafferServer) FindOneById(ctx context.Context, in *pb.FindOneByIdReq) (*pb.StafferInfo, error) {
+	l := logic.NewFindOneByIdLogic(ctx, s.svcCtx)
+	return l.FindOneById(in)
 }
 
 func (s *StafferServer) FindOneByName(ctx context.Context, in *pb.FindOneByNameReq) (*pb.StafferInfo, error) {

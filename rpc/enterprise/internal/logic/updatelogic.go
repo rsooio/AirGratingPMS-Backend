@@ -11,21 +11,21 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ChangeLogic struct {
+type UpdateLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewChangeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ChangeLogic {
-	return &ChangeLogic{
+func NewUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateLogic {
+	return &UpdateLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *ChangeLogic) Change(in *pb.EnterpriseInfoWithId) (*pb.Empty, error) {
+func (l *UpdateLogic) Update(in *pb.EnterpriseInfo) (*pb.Empty, error) {
 	return &pb.Empty{}, l.svcCtx.EnterpriseModel.Update(l.ctx, &enterprise.Enterprise{
 		Id:      in.GetId(),
 		Name:    in.GetName(),

@@ -11,21 +11,21 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type PartialChangeLogic struct {
+type PartialUpdateLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewPartialChangeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PartialChangeLogic {
-	return &PartialChangeLogic{
+func NewPartialUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PartialUpdateLogic {
+	return &PartialUpdateLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *PartialChangeLogic) PartialChange(in *pb.EnterpriseInfoWithId) (*pb.Empty, error) {
+func (l *PartialUpdateLogic) PartialUpdate(in *pb.EnterpriseInfo) (*pb.Empty, error) {
 	now, err := l.svcCtx.EnterpriseModel.FindOne(l.ctx, in.GetId())
 	if err != nil {
 		return nil, err

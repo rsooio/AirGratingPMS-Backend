@@ -5,6 +5,8 @@ import (
 
 	"air-grating-pms-backend/api/organization/internal/svc"
 	"air-grating-pms-backend/api/organization/internal/types"
+	"air-grating-pms-backend/rpc/enterprise/pb"
+	"air-grating-pms-backend/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +26,11 @@ func NewDeleteEnterpriseLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 }
 
 func (l *DeleteEnterpriseLogic) DeleteEnterprise() (resp *types.DeleteEnterpriseReply, err error) {
-	// todo: add your logic here and delete this line
+	_, err = l.svcCtx.EnterpriseRPC.Delete(l.ctx, &pb.DeleteReq{
+		Id: utils.GetEnterpriseId(l.ctx),
+	})
 
-	return
+	return &types.DeleteEnterpriseReply{
+		Message: "OK",
+	}, err
 }

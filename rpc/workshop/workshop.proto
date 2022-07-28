@@ -1,33 +1,19 @@
 syntax = "proto3";
 
 package workshop;
-option go_package="./types";
+option go_package="./pb";
 
 message Empty {}
 
 service workshop {
     rpc Insert (WorkshopInfo) returns (Empty);
     rpc Delete (DeleteReq) returns (Empty);
-    rpc Change (WorkshopInfoWithId) returns (Empty);
-    rpc PartialChange (WorkshopInfoWithId) returns (Empty);
+    rpc Update (WorkshopInfo) returns (Empty);
+    rpc PartialUpdate (WorkshopInfo) returns (Empty);
     rpc FindListByEnterprise (FindListByEnterpriseReq) returns (WorkshopList);
 }
 
 message WorkshopInfo {
-    int64  EnterpriseId = 1;
-    int64  ManagerId    = 2;
-    string Name         = 3;
-    string Address      = 4;
-    string PhoneNumber  = 5;
-    string Remark       = 6;
-    int64  Version      = 7;
-}
-
-message DeleteReq {
-    int64 id = 1;
-}
-
-message WorkshopInfoWithId {
     int64  Id           = 1;
     int64  EnterpriseId = 2;
     int64  ManagerId    = 3;
@@ -36,7 +22,10 @@ message WorkshopInfoWithId {
     string PhoneNumber  = 6;
     string Remark       = 7;
     int64  Version      = 8;
-    
+}
+
+message DeleteReq {
+    int64 id = 1;
 }
 
 message FindListByEnterpriseReq {
@@ -46,5 +35,5 @@ message FindListByEnterpriseReq {
 }
 
 message WorkshopList {
-    repeated WorkshopInfoWithId List = 1;
+    repeated WorkshopInfo List = 1;
 }

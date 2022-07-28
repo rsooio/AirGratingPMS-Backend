@@ -8,8 +8,7 @@ import (
 
 	"air-grating-pms-backend/api/staffer/internal/svc"
 	"air-grating-pms-backend/api/staffer/internal/types"
-	"air-grating-pms-backend/common/middleware"
-	"air-grating-pms-backend/model/staffer"
+	"air-grating-pms-backend/rpc/staffer/pb"
 	"air-grating-pms-backend/utils/bcrypt"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -35,13 +34,11 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginReply, err err
 		return nil, errors.New("参数错误")
 	}
 
-	enterpriseID := l.ctx.Value(middleware.EnterpriseID).(int64)
-	stafferInfo, err := l.svcCtx.StafferModel.FindOneByEnterpriseIdUsername(l.ctx, enterpriseID, req.Username)
-	switch err {
-	case nil:
-	case staffer.ErrNotFound:
-		return nil, errors.New("用户名不存在")
-	default:
+	stafferInfo, err := l.svcCtx.StafferRPC.FindOneByName(l.ctx, &pb.FindOneByNameReq{
+		EnterpriseId: req.EnterpriseId,
+		Username:     req.Username,
+	})
+	if err != nil {
 		return nil, err
 	}
 
@@ -58,8 +55,10 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginReply, err err
 	claims := make(jwt.MapClaims)
 	claims["exp"] = now + accessExpire
 	claims["iat"] = now
-	claims["uid"] = stafferInfo.Id
 	claims["rol"] = stafferInfo.Role
+	claims["uid"] = stafferInfo.Id
+	claims["wid"] = stafferInfo.WorkshopId
+	claims["eid"] = stafferInfo.EnterpriseId
 	token := jwt.New(jwt.SigningMethodHS256)
 	token.Claims = claims
 	jwt, err := token.SignedString([]byte(l.svcCtx.Config.Auth.AccessSecret))
@@ -70,7 +69,7 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginReply, err err
 	return &types.LoginReply{
 		Id:           stafferInfo.Id,
 		Name:         stafferInfo.Name,
-		Gender:       stafferInfo.Gender.String,
+		Gender:       stafferInfo.Gender,
 		Role:         stafferInfo.Role,
 		AccessToken:  jwt,
 		AccessExpire: accessExpire,

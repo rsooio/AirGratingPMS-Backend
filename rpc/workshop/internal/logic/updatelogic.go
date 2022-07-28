@@ -6,27 +6,27 @@ import (
 
 	"air-grating-pms-backend/model/workshop"
 	"air-grating-pms-backend/rpc/workshop/internal/svc"
-	"air-grating-pms-backend/rpc/workshop/types"
+	"air-grating-pms-backend/rpc/workshop/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ChangeLogic struct {
+type UpdateLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewChangeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ChangeLogic {
-	return &ChangeLogic{
+func NewUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateLogic {
+	return &UpdateLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *ChangeLogic) Change(in *types.WorkshopInfoWithId) (*types.Empty, error) {
-	return &types.Empty{}, l.svcCtx.WorkshopModel.Update(l.ctx, &workshop.Workshop{
+func (l *UpdateLogic) Update(in *pb.WorkshopInfo) (*pb.Empty, error) {
+	return &pb.Empty{}, l.svcCtx.WorkshopModel.Update(l.ctx, &workshop.Workshop{
 		Id:           in.GetId(),
 		EnterpriseId: in.GetEnterpriseId(),
 		Name:         in.GetName(),

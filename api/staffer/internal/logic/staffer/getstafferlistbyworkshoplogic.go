@@ -12,23 +12,24 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type GetStafferListLogic struct {
+type GetStafferListByWorkshopLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewGetStafferListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetStafferListLogic {
-	return &GetStafferListLogic{
+func NewGetStafferListByWorkshopLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetStafferListByWorkshopLogic {
+	return &GetStafferListByWorkshopLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *GetStafferListLogic) GetStafferList(req *types.GetStafferListReq) (resp *types.GetStafferListReply, err error) {
-	list, err := l.svcCtx.StafferRPC.FindListByEnterprise(l.ctx, &pb.FindListByEnterpriseReq{
+func (l *GetStafferListByWorkshopLogic) GetStafferListByWorkshop(req *types.GetStafferListByWorkshopReq) (resp *types.GetStafferListByWorkshopReply, err error) {
+	list, err := l.svcCtx.StafferRPC.FindListByWorkshop(l.ctx, &pb.FindListByWorkshopReq{
 		EnterpriseId: utils.GetEnterpriseId(l.ctx),
+		WorkshopId:   utils.GetWorkshopId(l.ctx),
 		PageSize:     req.PageSize,
 		PageNumber:   req.PageNumber,
 	})
@@ -38,7 +39,7 @@ func (l *GetStafferListLogic) GetStafferList(req *types.GetStafferListReq) (resp
 
 	listResp, err := convert.ListConvert(list)
 
-	return &types.GetStafferListReply{
+	return &types.GetStafferListByWorkshopReply{
 		Message:     "OK",
 		StafferList: *listResp,
 	}, err

@@ -5,6 +5,8 @@ import (
 
 	"air-grating-pms-backend/api/organization/internal/svc"
 	"air-grating-pms-backend/api/organization/internal/types"
+	"air-grating-pms-backend/rpc/workshop/pb"
+	"air-grating-pms-backend/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +26,19 @@ func NewPartialChangeWorkshopInfoLogic(ctx context.Context, svcCtx *svc.ServiceC
 }
 
 func (l *PartialChangeWorkshopInfoLogic) PartialChangeWorkshopInfo(req *types.PartialChangeWorkshopInfoReq) (resp *types.PartialChangeWorkshopInfoReply, err error) {
-	// todo: add your logic here and delete this line
+	_, err = l.svcCtx.WorkshopRPC.PartialUpdate(l.ctx, &pb.WorkshopInfo{
+		Id:           req.Id,
+		EnterpriseId: utils.GetEnterpriseId(l.ctx),
+		ManagerId:    req.ManagerId,
+		Name:         req.Name,
+		Address:      req.Address,
+		PhoneNumber:  req.PhoneNumber,
+		Remark:       req.Remark,
+	})
 
-	return
+	return &types.PartialChangeWorkshopInfoReply{
+		Message: "OK",
+		// todo
+		ChangedFields: []string{},
+	}, err
 }

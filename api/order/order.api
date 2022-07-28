@@ -1,0 +1,42 @@
+syntax = "v1"
+
+info(
+	title: Order Module
+	desc: Everything about Order
+	author: rsooio
+	email: risin@risin.work
+	version: 1.0
+)
+
+type (
+    CreateOrderReq {
+        WorkshopId  int64  `json:"workshop_id"`
+        ClientId    int64  `json:"client_id"`
+        Address     string `json:"address"`
+        Linkman     string `json:"linkman"`
+        PhoneNumber string `json:"phone_number"`
+        Email       string `json:"email"`
+        Remark      string `json:"remark"`
+    }
+)
+
+@server(
+	jwt: Auth
+	group: order
+)
+service order-api {
+    @handler CreateOrder
+	post /order (CreateOrderReq) returns(CreateOrderReply)
+	
+	@handler UpdateOrderInfo
+	put /order (UpdateOrderInfoReq) returns(UpdateOrderInfoReply)
+	
+	@handler PartialUpdateOrderInfo
+	patch /order (PartialUpdateOrderInfoReq) returns(PartialUpdateOrderInfoReply)
+	
+	@handler DeleteOrder
+	delete /order (DeleteOrderReq) returns(DeleteOrderReply)
+	
+	@handler GetOrderList
+	get /order (GetOrderListReq) returns(GetOrderListReply)
+}

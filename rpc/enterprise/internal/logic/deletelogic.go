@@ -24,5 +24,5 @@ func NewDeleteLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DeleteLogi
 }
 
 func (l *DeleteLogic) Delete(in *pb.DeleteReq) (*pb.Empty, error) {
-	return &pb.Empty{}, l.svcCtx.EnterpriseModel.Delete(l.ctx, in.GetId())
+	return &pb.Empty{}, l.svcCtx.EnterpriseModel.SoftDelete(l.ctx, in.GetId())
 }

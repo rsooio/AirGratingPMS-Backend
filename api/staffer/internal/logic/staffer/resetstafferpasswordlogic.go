@@ -5,6 +5,8 @@ import (
 
 	"air-grating-pms-backend/api/staffer/internal/svc"
 	"air-grating-pms-backend/api/staffer/internal/types"
+	"air-grating-pms-backend/rpc/staffer/pb"
+	"air-grating-pms-backend/utils/bcrypt"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +26,18 @@ func NewResetStafferPasswordLogic(ctx context.Context, svcCtx *svc.ServiceContex
 }
 
 func (l *ResetStafferPasswordLogic) ResetStafferPassword(req *types.ResetStafferPasswordReq) (resp *types.ResetStafferPasswordReply, err error) {
-	// todo: add your logic here and delete this line
+	hashedPassword, err := bcrypt.Encrypt(l.svcCtx.Config.DefaultPassword)
+	if err != nil {
+		return nil, err
+	}
 
-	return
+	_, err = l.svcCtx.StafferRPC.PartialUpdate(l.ctx, &pb.StafferInfo{
+		Id:             req.Id,
+		HashedPassword: hashedPassword,
+	})
+
+	return &types.ResetStafferPasswordReply{
+		Message:  "OK",
+		Password: l.svcCtx.Config.DefaultPassword,
+	}, err
 }

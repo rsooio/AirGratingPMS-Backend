@@ -6,7 +6,7 @@ import (
 
 	"air-grating-pms-backend/model/workshop"
 	"air-grating-pms-backend/rpc/workshop/internal/svc"
-	"air-grating-pms-backend/rpc/workshop/types"
+	"air-grating-pms-backend/rpc/workshop/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -25,7 +25,7 @@ func NewInsertLogic(ctx context.Context, svcCtx *svc.ServiceContext) *InsertLogi
 	}
 }
 
-func (l *InsertLogic) Insert(in *types.WorkshopInfo) (*types.Empty, error) {
+func (l *InsertLogic) Insert(in *pb.WorkshopInfo) (*pb.Empty, error) {
 	_, err := l.svcCtx.WorkshopModel.Insert(l.ctx, &workshop.Workshop{
 		EnterpriseId: in.GetEnterpriseId(),
 		Name:         in.GetName(),
@@ -36,5 +36,5 @@ func (l *InsertLogic) Insert(in *types.WorkshopInfo) (*types.Empty, error) {
 		Version:      in.GetVersion(),
 	})
 
-	return &types.Empty{}, err
+	return &pb.Empty{}, err
 }

@@ -8,8 +8,6 @@ package pb
 
 import (
 	context "context"
-	"fmt"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -26,8 +24,8 @@ const _ = grpc.SupportPackageIsVersion7
 type EnterpriseClient interface {
 	Insert(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*InsertResp, error)
 	Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*Empty, error)
-	Change(ctx context.Context, in *EnterpriseInfoWithId, opts ...grpc.CallOption) (*Empty, error)
-	PartialChange(ctx context.Context, in *EnterpriseInfoWithId, opts ...grpc.CallOption) (*Empty, error)
+	Update(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error)
+	PartialUpdate(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error)
 	FindOneByName(ctx context.Context, in *FindOneByNameReq, opts ...grpc.CallOption) (*EnterpriseInfo, error)
 	InsertXa(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*InsertResp, error)
 }
@@ -58,18 +56,18 @@ func (c *enterpriseClient) Delete(ctx context.Context, in *DeleteReq, opts ...gr
 	return out, nil
 }
 
-func (c *enterpriseClient) Change(ctx context.Context, in *EnterpriseInfoWithId, opts ...grpc.CallOption) (*Empty, error) {
+func (c *enterpriseClient) Update(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/enterprise.enterprise/Change", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/enterprise.enterprise/Update", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *enterpriseClient) PartialChange(ctx context.Context, in *EnterpriseInfoWithId, opts ...grpc.CallOption) (*Empty, error) {
+func (c *enterpriseClient) PartialUpdate(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/enterprise.enterprise/PartialChange", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/enterprise.enterprise/PartialUpdate", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,9 +87,6 @@ func (c *enterpriseClient) InsertXa(ctx context.Context, in *EnterpriseInfo, opt
 	out := new(InsertResp)
 	err := c.cc.Invoke(ctx, "/enterprise.enterprise/InsertXa", in, out, opts...)
 	if err != nil {
-		fmt.Println("====================================================================================================")
-		fmt.Println(err.Error())
-		fmt.Println("====================================================================================================")
 		return nil, err
 	}
 	return out, nil
@@ -103,8 +98,8 @@ func (c *enterpriseClient) InsertXa(ctx context.Context, in *EnterpriseInfo, opt
 type EnterpriseServer interface {
 	Insert(context.Context, *EnterpriseInfo) (*InsertResp, error)
 	Delete(context.Context, *DeleteReq) (*Empty, error)
-	Change(context.Context, *EnterpriseInfoWithId) (*Empty, error)
-	PartialChange(context.Context, *EnterpriseInfoWithId) (*Empty, error)
+	Update(context.Context, *EnterpriseInfo) (*Empty, error)
+	PartialUpdate(context.Context, *EnterpriseInfo) (*Empty, error)
 	FindOneByName(context.Context, *FindOneByNameReq) (*EnterpriseInfo, error)
 	InsertXa(context.Context, *EnterpriseInfo) (*InsertResp, error)
 	mustEmbedUnimplementedEnterpriseServer()
@@ -120,11 +115,11 @@ func (UnimplementedEnterpriseServer) Insert(context.Context, *EnterpriseInfo) (*
 func (UnimplementedEnterpriseServer) Delete(context.Context, *DeleteReq) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
-func (UnimplementedEnterpriseServer) Change(context.Context, *EnterpriseInfoWithId) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Change not implemented")
+func (UnimplementedEnterpriseServer) Update(context.Context, *EnterpriseInfo) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
-func (UnimplementedEnterpriseServer) PartialChange(context.Context, *EnterpriseInfoWithId) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PartialChange not implemented")
+func (UnimplementedEnterpriseServer) PartialUpdate(context.Context, *EnterpriseInfo) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PartialUpdate not implemented")
 }
 func (UnimplementedEnterpriseServer) FindOneByName(context.Context, *FindOneByNameReq) (*EnterpriseInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindOneByName not implemented")
@@ -181,38 +176,38 @@ func _Enterprise_Delete_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Enterprise_Change_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EnterpriseInfoWithId)
+func _Enterprise_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnterpriseInfo)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EnterpriseServer).Change(ctx, in)
+		return srv.(EnterpriseServer).Update(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/enterprise.enterprise/Change",
+		FullMethod: "/enterprise.enterprise/Update",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EnterpriseServer).Change(ctx, req.(*EnterpriseInfoWithId))
+		return srv.(EnterpriseServer).Update(ctx, req.(*EnterpriseInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Enterprise_PartialChange_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EnterpriseInfoWithId)
+func _Enterprise_PartialUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnterpriseInfo)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EnterpriseServer).PartialChange(ctx, in)
+		return srv.(EnterpriseServer).PartialUpdate(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/enterprise.enterprise/PartialChange",
+		FullMethod: "/enterprise.enterprise/PartialUpdate",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EnterpriseServer).PartialChange(ctx, req.(*EnterpriseInfoWithId))
+		return srv.(EnterpriseServer).PartialUpdate(ctx, req.(*EnterpriseInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -269,12 +264,12 @@ var Enterprise_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Enterprise_Delete_Handler,
 		},
 		{
-			MethodName: "Change",
-			Handler:    _Enterprise_Change_Handler,
+			MethodName: "Update",
+			Handler:    _Enterprise_Update_Handler,
 		},
 		{
-			MethodName: "PartialChange",
-			Handler:    _Enterprise_PartialChange_Handler,
+			MethodName: "PartialUpdate",
+			Handler:    _Enterprise_PartialUpdate_Handler,
 		},
 		{
 			MethodName: "FindOneByName",

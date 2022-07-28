@@ -8,8 +8,10 @@ message Empty {}
 service staffer {
     rpc Insert (StafferInfo) returns (InsertResp);
     rpc Delete (DeleteReq) returns (Empty);
-    rpc Change (StafferInfoWithId) returns (Empty);
-    rpc PartialChange (StafferInfoWithId) returns (Empty);
+    rpc Update (StafferInfo) returns (Empty);
+    rpc CustomUpdate (StafferInfo) returns (Empty);
+    rpc PartialUpdate (StafferInfo) returns (Empty);
+    rpc FindOneById (FindOneByIdReq) returns (StafferInfo);
     rpc FindOneByName (FindOneByNameReq) returns (StafferInfo);
     rpc FindListByWorkshop (FindListByWorkshopReq) returns (StafferList);
     rpc FindListByEnterprise (FindListByEnterpriseReq) returns (StafferList);
@@ -18,30 +20,6 @@ service staffer {
 }
 
 message StafferInfo {
-    int64  EnterpriseId   = 1;
-    int64  WorkshopId     = 2;
-    string Username       = 3;
-    string Role           = 4;
-    string Name           = 5;
-    string HashedPassword = 6;
-    string Gender         = 7;
-    string PhoneNumber    = 8;
-    string Email          = 9;
-    string Address        = 10;
-    int64  ExpireTime     = 11;
-    string Remark         = 12;
-    int64  Version        = 13;
-}
-
-message InsertResp {
-    int64 Id = 1;
-}
-
-message DeleteReq {
-    int64 Id = 1;
-}
-
-message StafferInfoWithId {
     int64  Id             = 1;
     int64  EnterpriseId   = 2;
     int64  WorkshopId     = 3;
@@ -56,6 +34,18 @@ message StafferInfoWithId {
     int64  ExpireTime     = 12;
     string Remark         = 13;
     int64  Version        = 14;
+}
+
+message InsertResp {
+    int64 Id = 1;
+}
+
+message DeleteReq {
+    int64 Id = 1;
+}
+
+message FindOneByIdReq {
+    int64 Id = 1;
 }
 
 message FindOneByNameReq {
@@ -77,5 +67,5 @@ message FindListByEnterpriseReq {
 }
 
 message StafferList {
-    repeated StafferInfoWithId StafferList = 1;
+    repeated StafferInfo StafferList = 1;
 }
