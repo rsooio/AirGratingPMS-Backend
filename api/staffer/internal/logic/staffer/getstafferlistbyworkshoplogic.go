@@ -5,7 +5,6 @@ import (
 
 	"air-grating-pms-backend/api/staffer/internal/svc"
 	"air-grating-pms-backend/api/staffer/internal/types"
-	"air-grating-pms-backend/api/staffer/utils/convert"
 	"air-grating-pms-backend/rpc/staffer/pb"
 	"air-grating-pms-backend/utils"
 
@@ -33,14 +32,10 @@ func (l *GetStafferListByWorkshopLogic) GetStafferListByWorkshop(req *types.GetS
 		PageSize:     req.PageSize,
 		PageNumber:   req.PageNumber,
 	})
-	if err != nil {
-		return nil, err
-	}
-
-	listResp, err := convert.ListConvert(list)
 
 	return &types.GetStafferListByWorkshopReply{
 		Message:     "OK",
-		StafferList: *listResp,
+		Count:       list.Count,
+		StafferList: *list.ApiList(),
 	}, err
 }

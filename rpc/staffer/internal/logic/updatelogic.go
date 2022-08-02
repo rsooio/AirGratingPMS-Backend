@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"database/sql"
 
 	"air-grating-pms-backend/model/staffer"
 	"air-grating-pms-backend/rpc/staffer/internal/svc"
@@ -27,19 +26,19 @@ func NewUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateLogi
 
 func (l *UpdateLogic) Update(in *pb.StafferInfo) (*pb.Empty, error) {
 	return &pb.Empty{}, l.svcCtx.StafferModel.Update(l.ctx, &staffer.Staffer{
-		Id:             in.GetId(),
-		EnterpriseId:   in.GetExpireTime(),
-		WorkshopId:     in.GetWorkshopId(),
-		Username:       in.GetUsername(),
-		Role:           in.GetRole(),
-		Name:           in.GetName(),
-		HashedPassword: in.GetHashedPassword(),
-		Gender:         sql.NullString{String: in.GetGender(), Valid: true},
-		PhoneNumber:    sql.NullString{String: in.GetPhoneNumber(), Valid: true},
-		Email:          sql.NullString{String: in.GetEmail(), Valid: true},
-		Address:        sql.NullString{String: in.GetAddress(), Valid: true},
-		ExpireTime:     in.GetExpireTime(),
-		Remark:         sql.NullString{String: in.GetRemark(), Valid: true},
-		Version:        in.GetVersion(),
+		Id:             in.Id,
+		EnterpriseId:   in.EnterpriseId,
+		WorkshopId:     in.WorkshopId,
+		Username:       in.Username,
+		Role:           in.Role,
+		Name:           in.Name,
+		HashedPassword: in.HashedPassword,
+		Gender:         in.Gender,
+		PhoneNumber:    in.PhoneNumber,
+		Email:          in.Email,
+		Address:        in.Address,
+		ExpireTime:     in.ExpireTime,
+		Remark:         in.Remark,
+		Version:        in.Version,
 	})
 }

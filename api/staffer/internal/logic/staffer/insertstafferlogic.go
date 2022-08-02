@@ -12,29 +12,34 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type CreateStafferLogic struct {
+type InsertStafferLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewCreateStafferLogic(ctx context.Context, svcCtx *svc.ServiceContext) *CreateStafferLogic {
-	return &CreateStafferLogic{
+func NewInsertStafferLogic(ctx context.Context, svcCtx *svc.ServiceContext) *InsertStafferLogic {
+	return &InsertStafferLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *CreateStafferLogic) CreateStaffer(req *types.CreateStafferReq) (resp *types.CreateReply, err error) {
+func (l *InsertStafferLogic) InsertStaffer(req *types.InsertStafferReq) (resp *types.InsertStafferReply, err error) {
+	workshopId := req.WorkshopId
+	if utils.GetRole(l.ctx) != "boss" {
+		workshopId = utils.GetWorkshopId(l.ctx)
+	}
+
 	hashedPassword, err := bcrypt.Encrypt(l.svcCtx.Config.DefaultPassword)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = l.svcCtx.StafferRPC.Insert(l.ctx, &pb.StafferInfo{
+	info, err := l.svcCtx.StafferRPC.Insert(l.ctx, &pb.StafferInfo{
 		EnterpriseId:   utils.GetEnterpriseId(l.ctx),
-		WorkshopId:     req.WorkshopId,
+		WorkshopId:     workshopId,
 		Username:       req.Username,
 		Role:           req.Role,
 		Name:           req.Name,
@@ -47,7 +52,8 @@ func (l *CreateStafferLogic) CreateStaffer(req *types.CreateStafferReq) (resp *t
 		Remark:         req.Remark,
 	})
 
-	return &types.CreateReply{
+	return &types.InsertStafferReply{
+		Id:       info.Id,
 		Message:  "OK",
 		Password: l.svcCtx.Config.DefaultPassword,
 	}, err

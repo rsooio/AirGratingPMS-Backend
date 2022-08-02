@@ -41,22 +41,22 @@ type (
 	}
 
 	Staffer struct {
-		Id             int64          `db:"id"`
-		EnterpriseId   int64          `db:"enterprise_id"`
-		WorkshopId     int64          `db:"workshop_id"`
-		Username       string         `db:"username"`
-		Role           string         `db:"role"`
-		Name           string         `db:"name"`
-		HashedPassword string         `db:"hashed_password"`
-		Gender         sql.NullString `db:"gender"`
-		PhoneNumber    sql.NullString `db:"phone_number"`
-		Email          sql.NullString `db:"email"`
-		Address        sql.NullString `db:"address"`
-		CreateTime     time.Time      `db:"create_time"`
-		UpdateTime     time.Time      `db:"update_time"`
-		ExpireTime     int64          `db:"expire_time"`
-		Remark         sql.NullString `db:"remark"`
-		Version        int64          `db:"version"`
+		Id             int64     `db:"id"`
+		EnterpriseId   int64     `db:"enterprise_id"`
+		WorkshopId     int64     `db:"workshop_id"`
+		Username       string    `db:"username"`
+		Role           string    `db:"role"`
+		Name           string    `db:"name"`
+		HashedPassword string    `db:"hashed_password"`
+		Gender         string    `db:"gender"`
+		PhoneNumber    string    `db:"phone_number"`
+		Email          string    `db:"email"`
+		Address        string    `db:"address"`
+		CreateTime     time.Time `db:"create_time"`
+		UpdateTime     time.Time `db:"update_time"`
+		ExpireTime     int64     `db:"expire_time"`
+		Remark         string    `db:"remark"`
+		Version        int64     `db:"version"`
 	}
 )
 

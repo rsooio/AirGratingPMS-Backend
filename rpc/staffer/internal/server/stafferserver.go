@@ -37,16 +37,6 @@ func (s *StafferServer) Update(ctx context.Context, in *pb.StafferInfo) (*pb.Emp
 	return l.Update(in)
 }
 
-func (s *StafferServer) CustomUpdate(ctx context.Context, in *pb.StafferInfo) (*pb.Empty, error) {
-	l := logic.NewCustomUpdateLogic(ctx, s.svcCtx)
-	return l.CustomUpdate(in)
-}
-
-func (s *StafferServer) PartialUpdate(ctx context.Context, in *pb.StafferInfo) (*pb.Empty, error) {
-	l := logic.NewPartialUpdateLogic(ctx, s.svcCtx)
-	return l.PartialUpdate(in)
-}
-
 func (s *StafferServer) FindOneById(ctx context.Context, in *pb.FindOneByIdReq) (*pb.StafferInfo, error) {
 	l := logic.NewFindOneByIdLogic(ctx, s.svcCtx)
 	return l.FindOneById(in)

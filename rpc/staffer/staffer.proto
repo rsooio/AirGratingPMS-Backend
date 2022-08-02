@@ -9,8 +9,6 @@ service staffer {
     rpc Insert (StafferInfo) returns (InsertResp);
     rpc Delete (DeleteReq) returns (Empty);
     rpc Update (StafferInfo) returns (Empty);
-    rpc CustomUpdate (StafferInfo) returns (Empty);
-    rpc PartialUpdate (StafferInfo) returns (Empty);
     rpc FindOneById (FindOneByIdReq) returns (StafferInfo);
     rpc FindOneByName (FindOneByNameReq) returns (StafferInfo);
     rpc FindListByWorkshop (FindListByWorkshopReq) returns (StafferList);
@@ -67,5 +65,6 @@ message FindListByEnterpriseReq {
 }
 
 message StafferList {
-    repeated StafferInfo StafferList = 1;
+    int64                Count = 1;
+    repeated StafferInfo List  = 2;
 }

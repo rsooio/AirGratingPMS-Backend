@@ -26,22 +26,17 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodPost,
 				Path:    "/staffer",
-				Handler: staffer.CreateStafferHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPut,
-				Path:    "/staffer",
-				Handler: staffer.ChangeStafferInfoHandler(serverCtx),
+				Handler: staffer.InsertStafferHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPatch,
 				Path:    "/staffer",
-				Handler: staffer.PartialChangeStafferInfoHandler(serverCtx),
+				Handler: staffer.UpdateStafferInfoHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,
 				Path:    "/staffer",
-				Handler: staffer.GetStafferListHandler(serverCtx),
+				Handler: staffer.GetStafferListByEnterpriseHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodGet,
@@ -51,7 +46,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodPut,
 				Path:    "/staffer/password",
-				Handler: staffer.ChangeStafferPasswordHandler(serverCtx),
+				Handler: staffer.UpdateStafferPasswordHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodDelete,

@@ -5,7 +5,6 @@ import (
 
 	"air-grating-pms-backend/rpc/staffer/internal/svc"
 	"air-grating-pms-backend/rpc/staffer/pb"
-	"air-grating-pms-backend/rpc/staffer/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,5 +26,5 @@ func NewFindOneByIdLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FindO
 func (l *FindOneByIdLogic) FindOneById(in *pb.FindOneByIdReq) (*pb.StafferInfo, error) {
 	info, err := l.svcCtx.StafferModel.FindOne(l.ctx, in.GetId())
 
-	return utils.SingleConvert(info), err
+	return info.Rpc(), err
 }

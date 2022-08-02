@@ -25,8 +25,6 @@ type StafferClient interface {
 	Insert(ctx context.Context, in *StafferInfo, opts ...grpc.CallOption) (*InsertResp, error)
 	Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*Empty, error)
 	Update(ctx context.Context, in *StafferInfo, opts ...grpc.CallOption) (*Empty, error)
-	CustomUpdate(ctx context.Context, in *StafferInfo, opts ...grpc.CallOption) (*Empty, error)
-	PartialUpdate(ctx context.Context, in *StafferInfo, opts ...grpc.CallOption) (*Empty, error)
 	FindOneById(ctx context.Context, in *FindOneByIdReq, opts ...grpc.CallOption) (*StafferInfo, error)
 	FindOneByName(ctx context.Context, in *FindOneByNameReq, opts ...grpc.CallOption) (*StafferInfo, error)
 	FindListByWorkshop(ctx context.Context, in *FindListByWorkshopReq, opts ...grpc.CallOption) (*StafferList, error)
@@ -63,24 +61,6 @@ func (c *stafferClient) Delete(ctx context.Context, in *DeleteReq, opts ...grpc.
 func (c *stafferClient) Update(ctx context.Context, in *StafferInfo, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
 	err := c.cc.Invoke(ctx, "/staffer.staffer/Update", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *stafferClient) CustomUpdate(ctx context.Context, in *StafferInfo, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/staffer.staffer/CustomUpdate", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *stafferClient) PartialUpdate(ctx context.Context, in *StafferInfo, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/staffer.staffer/PartialUpdate", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -139,8 +119,6 @@ type StafferServer interface {
 	Insert(context.Context, *StafferInfo) (*InsertResp, error)
 	Delete(context.Context, *DeleteReq) (*Empty, error)
 	Update(context.Context, *StafferInfo) (*Empty, error)
-	CustomUpdate(context.Context, *StafferInfo) (*Empty, error)
-	PartialUpdate(context.Context, *StafferInfo) (*Empty, error)
 	FindOneById(context.Context, *FindOneByIdReq) (*StafferInfo, error)
 	FindOneByName(context.Context, *FindOneByNameReq) (*StafferInfo, error)
 	FindListByWorkshop(context.Context, *FindListByWorkshopReq) (*StafferList, error)
@@ -161,12 +139,6 @@ func (UnimplementedStafferServer) Delete(context.Context, *DeleteReq) (*Empty, e
 }
 func (UnimplementedStafferServer) Update(context.Context, *StafferInfo) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
-}
-func (UnimplementedStafferServer) CustomUpdate(context.Context, *StafferInfo) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CustomUpdate not implemented")
-}
-func (UnimplementedStafferServer) PartialUpdate(context.Context, *StafferInfo) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PartialUpdate not implemented")
 }
 func (UnimplementedStafferServer) FindOneById(context.Context, *FindOneByIdReq) (*StafferInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindOneById not implemented")
@@ -246,42 +218,6 @@ func _Staffer_Update_Handler(srv interface{}, ctx context.Context, dec func(inte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(StafferServer).Update(ctx, req.(*StafferInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Staffer_CustomUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StafferInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(StafferServer).CustomUpdate(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/staffer.staffer/CustomUpdate",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StafferServer).CustomUpdate(ctx, req.(*StafferInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Staffer_PartialUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StafferInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(StafferServer).PartialUpdate(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/staffer.staffer/PartialUpdate",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StafferServer).PartialUpdate(ctx, req.(*StafferInfo))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -394,14 +330,6 @@ var Staffer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Update",
 			Handler:    _Staffer_Update_Handler,
-		},
-		{
-			MethodName: "CustomUpdate",
-			Handler:    _Staffer_CustomUpdate_Handler,
-		},
-		{
-			MethodName: "PartialUpdate",
-			Handler:    _Staffer_PartialUpdate_Handler,
 		},
 		{
 			MethodName: "FindOneById",

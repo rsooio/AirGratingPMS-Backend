@@ -31,7 +31,7 @@ func (l *ResetStafferPasswordLogic) ResetStafferPassword(req *types.ResetStaffer
 		return nil, err
 	}
 
-	_, err = l.svcCtx.StafferRPC.PartialUpdate(l.ctx, &pb.StafferInfo{
+	_, err = l.svcCtx.StafferRPC.Update(l.ctx, &pb.StafferInfo{
 		Id:             req.Id,
 		HashedPassword: hashedPassword,
 	})

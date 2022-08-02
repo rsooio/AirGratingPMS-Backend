@@ -16,20 +16,7 @@ type LoginReply struct {
 	AccessExpire int64  `json:"access_expire"`
 }
 
-type Staffer struct {
-	Id          int64  `json:"id"`
-	Username    string `json:"username"`
-	WorkshopId  int64  `json:"workshop_id"`
-	Name        string `json:"name"`
-	Role        string `json:"role"`
-	Gender      string `json:"gender"`
-	PhoneNumber string `json:"phone_number"`
-	Email       string `json:"email"`
-	Address     string `json:"address"`
-	Remark      string `json:"remark"`
-}
-
-type CreateStafferReq struct {
+type InsertStafferReq struct {
 	Username    string `json:"username"`
 	WorkshopId  int64  `json:"workshop_id"`
 	Name        string `json:"name"`
@@ -41,20 +28,13 @@ type CreateStafferReq struct {
 	Remark      string `json:"remark"`
 }
 
-type ChangeStafferInfoReq struct {
-	Id          int64  `json:"id"`
-	Username    string `json:"username"`
-	WorkshopId  int64  `json:"workshop_id"`
-	Name        string `json:"name"`
-	Role        string `json:"role,options=employee|manager"`
-	Gender      string `json:"gender,optional,options=male|female"`
-	PhoneNumber string `json:"phone_number,optional"`
-	Email       string `json:"email,optional"`
-	Address     string `json:"address,optional"`
-	Remark      string `json:"remark,optional"`
+type InsertStafferReply struct {
+	Id       int64  `json:"id"`
+	Message  string `json:"message"`
+	Password string `json:"password"`
 }
 
-type PartialChangeStafferInfoReq struct {
+type UpdateStafferInfoReq struct {
 	Id          int64  `json:"id"`
 	Username    string `json:"username,optional"`
 	WorkshopId  int64  `json:"workshop_id,optional"`
@@ -67,28 +47,33 @@ type PartialChangeStafferInfoReq struct {
 	Remark      string `json:"remark,optional"`
 }
 
-type CreateReply struct {
-	Message  string `json:"message"`
-	Password string `json:"password"`
-}
-
-type ChangeStafferInfoReply struct {
-	Message string `json:"message"`
-}
-
-type PartialChangeStafferInfoReply struct {
+type UpdateStafferInfoReply struct {
 	Message       string   `json:"message"`
 	ChangedFields []string `json:"changed_fields"`
 }
 
-type GetStafferListReq struct {
+type StafferInfo struct {
+	Id          int64  `json:"id"`
+	Username    string `json:"username"`
+	WorkshopId  int64  `json:"workshop_id"`
+	Name        string `json:"name"`
+	Role        string `json:"role"`
+	Gender      string `json:"gender"`
+	PhoneNumber string `json:"phone_number"`
+	Email       string `json:"email"`
+	Address     string `json:"address"`
+	Remark      string `json:"remark"`
+}
+
+type GetStafferListByEnterpriseReq struct {
 	PageNumber int32 `form:"page_number,default=1"`
 	PageSize   int32 `form:"page_size,default=20"`
 }
 
-type GetStafferListReply struct {
-	Message     string    `json:"message"`
-	StafferList []Staffer `json:"staffer_list"`
+type GetStafferListByEnterpriseReply struct {
+	Message     string        `json:"message"`
+	Count       int64         `json:"count"`
+	StafferList []StafferInfo `json:"staffer_list"`
 }
 
 type GetStafferListByWorkshopReq struct {
@@ -98,16 +83,17 @@ type GetStafferListByWorkshopReq struct {
 }
 
 type GetStafferListByWorkshopReply struct {
-	Message     string    `json:"message"`
-	StafferList []Staffer `json:"staffer_list"`
+	Message     string        `json:"message"`
+	Count       int64         `json:"count"`
+	StafferList []StafferInfo `json:"staffer_list"`
 }
 
-type ChangeStafferPasswordReq struct {
+type UpdateStafferPasswordReq struct {
 	OldPassword string `form:"old_password"`
 	NewPassword string `form:"new_password"`
 }
 
-type ChangeStafferPasswordReply struct {
+type UpdateStafferPasswordReply struct {
 	Message string `json:"message"`
 }
 

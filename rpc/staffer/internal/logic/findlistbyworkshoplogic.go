@@ -5,7 +5,6 @@ import (
 
 	"air-grating-pms-backend/rpc/staffer/internal/svc"
 	"air-grating-pms-backend/rpc/staffer/pb"
-	"air-grating-pms-backend/rpc/staffer/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -25,15 +24,13 @@ func NewFindListByWorkshopLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *FindListByWorkshopLogic) FindListByWorkshop(in *pb.FindListByWorkshopReq) (*pb.StafferList, error) {
-	list, err := l.svcCtx.StafferModel.FindListByWorkshop(l.ctx, in.GetEnterpriseId(), in.GetWorkshopId(), (in.GetPageNumber()-1)*in.GetPageSize(), in.GetPageSize())
+	list, count, err := l.svcCtx.StafferModel.FindListByWorkshop(l.ctx, in.GetEnterpriseId(), in.GetWorkshopId(), (in.GetPageNumber()-1)*in.GetPageSize(), in.GetPageSize())
 	if err != nil {
 		return nil, err
 	}
 
-	resp, err := utils.ListConvert(list)
-	if err != nil {
-		return nil, err
-	}
-
-	return resp, nil
+	return &pb.StafferList{
+		Count: count,
+		List:  *list.RpcList(),
+	}, nil
 }

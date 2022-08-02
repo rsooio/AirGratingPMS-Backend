@@ -1,21 +1,24 @@
 package staffer
 
 import (
+	"air-grating-pms-backend/utils/partial"
 	"context"
 	"database/sql"
 	"fmt"
 	"strings"
 
 	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/zeromicro/go-zero/core/mr"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
-	"github.com/zeromicro/go-zero/core/stringx"
 )
 
 var _ StafferModel = (*customStafferModel)(nil)
 
 var (
-	stafferRowsWithPlaceHolderWithoutPWD = strings.Join(stringx.Remove(stafferFieldNames, "`id`", "enterprise_id", "`hashed_password`", "`create_time`", "`update_time`", "expire_time", "version"), "=?,") + "=?"
+	cacheStafferWorkshopListCountPrefix   = "cache:order:enterprise:list:count:"
+	cacheStafferEnterpriseListCountPrefix = "cache:order:enterprise:list:count:"
+	stafferRowsWithPrefixA                = "a." + strings.Join(stafferFieldNames, ",a.")
 )
 
 type (
@@ -23,9 +26,11 @@ type (
 	// and implement the added methods in customStafferModel.
 	StafferModel interface {
 		stafferModel
-		CustomUpdate(ctx context.Context, data *Staffer) error
-		FindListByEnterprise(ctx context.Context, enterpriseId int64, offset, limit int32) ([]*Staffer, error)
-		FindListByWorkshop(ctx context.Context, enterpriseId int64, workshopId int64, offset, limit int32) ([]*Staffer, error)
+		Insert(ctx context.Context, data *Staffer) (sql.Result, error)
+		Update(ctx context.Context, data *Staffer) error
+		Delete(ctx context.Context, id int64) error
+		FindListByEnterprise(ctx context.Context, enterpriseId int64, offset, limit int32) (*StafferList, int64, error)
+		FindListByWorkshop(ctx context.Context, enterpriseId int64, workshopId int64, offset, limit int32) (*StafferList, int64, error)
 	}
 
 	customStafferModel struct {
@@ -40,44 +45,92 @@ func NewStafferModel(conn sqlx.SqlConn, c cache.CacheConf) StafferModel {
 	}
 }
 
-func stafferRowsWithPrefix(prefix string) string {
-	return prefix + "." + strings.Join(stafferFieldNames, ","+prefix+".")
+func cacheStafferEnterpriseListCountKey(enterpriseId int64) string {
+	return fmt.Sprintf("%s%v", cacheStafferEnterpriseListCountPrefix, enterpriseId)
 }
 
-func (m *customStafferModel) CustomUpdate(ctx context.Context, data *Staffer) error {
-	stafferEnterpriseIdUsernameKey := fmt.Sprintf("%s%v:%v", cacheStafferEnterpriseIdUsernamePrefix, data.EnterpriseId, data.Username)
-	stafferIdKey := fmt.Sprintf("%s%v", cacheStafferIdPrefix, data.Id)
+func cacheStafferWorkshopListCountKey(enterpriseId, workshopId int64) string {
+	return fmt.Sprintf("%s%v:%v", cacheStafferWorkshopListCountPrefix, enterpriseId, workshopId)
+}
+
+func (m *customStafferModel) Insert(ctx context.Context, data *Staffer) (sql.Result, error) {
+	m.DelCacheCtx(ctx, cacheStafferEnterpriseListCountKey(data.EnterpriseId), cacheStafferWorkshopListCountKey(data.EnterpriseId, data.WorkshopId))
+	return m.defaultStafferModel.Insert(ctx, data)
+}
+
+func (m *customStafferModel) Update(ctx context.Context, data *Staffer) error {
+	rows, args := partial.Partial(data)
+
+	productIdKey := fmt.Sprintf("%s%v", cacheStafferIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, stafferRowsWithPlaceHolderWithoutPWD)
-		return conn.ExecCtx(ctx, query, data.WorkshopId, data.Username, data.Role, data.Name, data.Gender, data.PhoneNumber, data.Email, data.Address, data.Remark, data.Id)
+		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, partial.RowsWithPlaceHolder(rows))
+		return conn.ExecCtx(ctx, query, append(args, data.Id)...)
+	}, productIdKey)
+	return err
+}
+
+func (m *customStafferModel) Delete(ctx context.Context, id int64) error {
+	data, err := m.FindOne(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	m.DelCacheCtx(ctx, cacheStafferEnterpriseListCountKey(data.EnterpriseId), cacheStafferWorkshopListCountKey(data.EnterpriseId, data.WorkshopId))
+	stafferEnterpriseIdUsernameKey := fmt.Sprintf("%s%v:%v", cacheStafferEnterpriseIdUsernamePrefix, data.EnterpriseId, data.Username)
+	stafferIdKey := fmt.Sprintf("%s%v", cacheStafferIdPrefix, id)
+	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
+		return conn.ExecCtx(ctx, query, id)
 	}, stafferEnterpriseIdUsernameKey, stafferIdKey)
 	return err
 }
 
-func (m *customStafferModel) FindListByEnterprise(ctx context.Context, enterpriseId int64, offset, limit int32) ([]*Staffer, error) {
-	resp := make([]*Staffer, 0)
-	query := fmt.Sprintf("SELECT %s FROM %s AS a INNER JOIN (SELECT `id` FROM %s WHERE `enterprise_id` = ? ORDER BY `id` desc LIMIT ?, ?) AS b ON a.id = b.id", stafferRowsWithPrefix("a"), m.table, m.table)
-	err := m.QueryRowsNoCacheCtx(ctx, &resp, query, enterpriseId, offset, limit)
-	if err != nil {
-		logx.Errorf("staffersEnterpriseId.findList error, enterpriseId=%d, offset=%d, limit=%d, err=%s", enterpriseId, offset, limit, err.Error())
-		if err == sqlx.ErrNotFound {
-			return nil, ErrNotFound
+func (m *customStafferModel) FindListByEnterprise(ctx context.Context, enterpriseId int64, offset, limit int32) (*StafferList, int64, error) {
+	resp := make(StafferList, 0)
+	var count int64
+
+	err := mr.Finish(func() error {
+		query := fmt.Sprintf("SELECT %s FROM %s AS a INNER JOIN (SELECT `id` FROM %s WHERE `enterprise_id` = ? ORDER BY `id` desc LIMIT ?, ?) AS b ON a.id = b.id", stafferRowsWithPrefixA, m.table, m.table)
+		err := m.QueryRowsNoCacheCtx(ctx, &resp, query, enterpriseId, offset, limit)
+		if err != nil {
+			logx.Errorf("stafferEnterpriseId.findList error, enterpriseId=%d, offset=%d, limit=%d, err=%s", enterpriseId, offset, limit, err.Error())
+			if err == sqlx.ErrNotFound {
+				return ErrNotFound
+			}
+			return err
 		}
-		return nil, err
-	}
-	return resp, nil
+		return nil
+	}, func() error {
+		query := fmt.Sprintf("SELECT count(*) FROM %s WHERE `enterprise_id` = ?", m.table)
+		return m.QueryRow(&count, cacheStafferEnterpriseListCountKey(enterpriseId), func(conn sqlx.SqlConn, v interface{}) error {
+			return conn.QueryRowCtx(ctx, v, query, enterpriseId)
+		})
+	})
+
+	return &resp, count, err
 }
 
-func (m *customStafferModel) FindListByWorkshop(ctx context.Context, enterpriseId int64, workshopId int64, offset, limit int32) ([]*Staffer, error) {
-	resp := make([]*Staffer, 0)
-	query := fmt.Sprintf("SELECT %s FROM %s AS a INNER JOIN (SELECT `id` FROM %s WHERE `enterprise_id` = ? AND `workshop_id` = ? LIMIT ?, ?) AS b ON a.id = b.id", stafferRowsWithPrefix("a"), m.table, m.table)
-	err := m.QueryRowsNoCacheCtx(ctx, &resp, query, enterpriseId, workshopId, offset, limit)
-	if err != nil {
-		logx.Errorf("staffersWorkshopId.findList error, enterpriseId=%d, workshopId=%d, offset=%d, limit=%d, err=%s", enterpriseId, workshopId, offset, limit, err.Error())
-		if err == sqlx.ErrNotFound {
-			return nil, ErrNotFound
+func (m *customStafferModel) FindListByWorkshop(ctx context.Context, enterpriseId int64, workshopId int64, offset, limit int32) (*StafferList, int64, error) {
+	resp := make(StafferList, 0)
+	var count int64
+
+	err := mr.Finish(func() error {
+		query := fmt.Sprintf("SELECT %s FROM %s AS a INNER JOIN (SELECT `id` FROM %s WHERE `enterprise_id` = ? AND `workshop_id` = ? ORDER BY `id` desc LIMIT ?, ?) AS b ON a.id = b.id", stafferRowsWithPrefixA, m.table, m.table)
+		err := m.QueryRowsNoCacheCtx(ctx, &resp, query, enterpriseId, workshopId, offset, limit)
+		if err != nil {
+			logx.Errorf("stafferWorkshopId.findList error, enterpriseId=%d, workshopId=%d, offset=%d, limit=%d, err=%s", enterpriseId, workshopId, offset, limit, err.Error())
+			if err == sqlx.ErrNotFound {
+				return ErrNotFound
+			}
+			return err
 		}
-		return nil, err
-	}
-	return resp, nil
+		return nil
+	}, func() error {
+		query := fmt.Sprintf("SELECT count(*) FROM %s WHERE `enterprise_id` = ?", m.table)
+		return m.QueryRow(&count, cacheStafferWorkshopListCountKey(enterpriseId, workshopId), func(conn sqlx.SqlConn, v interface{}) error {
+			return conn.QueryRowCtx(ctx, v, query, enterpriseId)
+		})
+	})
+
+	return &resp, count, err
 }

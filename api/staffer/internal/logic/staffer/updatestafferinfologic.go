@@ -11,32 +11,27 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type ChangeStafferInfoLogic struct {
+type UpdateStafferInfoLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewChangeStafferInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ChangeStafferInfoLogic {
-	return &ChangeStafferInfoLogic{
+func NewUpdateStafferInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateStafferInfoLogic {
+	return &UpdateStafferInfoLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *ChangeStafferInfoLogic) ChangeStafferInfo(req *types.ChangeStafferInfoReq) (resp *types.ChangeStafferInfoReply, err error) {
-	workshopId := req.WorkshopId
-	if utils.GetRole(l.ctx) != "boss" {
-		workshopId = utils.GetWorkshopId(l.ctx)
-	}
-
-	_, err = l.svcCtx.StafferRPC.CustomUpdate(l.ctx, &pb.StafferInfo{
+func (l *UpdateStafferInfoLogic) UpdateStafferInfo(req *types.UpdateStafferInfoReq) (resp *types.UpdateStafferInfoReply, err error) {
+	_, err = l.svcCtx.StafferRPC.Update(l.ctx, &pb.StafferInfo{
 		Id:          req.Id,
-		WorkshopId:  workshopId,
+		WorkshopId:  utils.SelectWorkshopId(l.ctx, req.WorkshopId),
 		Username:    req.Username,
 		Role:        req.Role,
-		Name:        req.Email,
+		Name:        req.Name,
 		Gender:      req.Gender,
 		PhoneNumber: req.PhoneNumber,
 		Email:       req.Email,
@@ -44,7 +39,8 @@ func (l *ChangeStafferInfoLogic) ChangeStafferInfo(req *types.ChangeStafferInfoR
 		Remark:      req.Remark,
 	})
 
-	return &types.ChangeStafferInfoReply{
-		Message: "OK",
+	return &types.UpdateStafferInfoReply{
+		Message:       "OK",
+		ChangedFields: []string{},
 	}, err
 }
