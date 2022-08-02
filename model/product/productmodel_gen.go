@@ -42,9 +42,9 @@ type (
 		Id           int64     `db:"id"`
 		ProductSetId int64     `db:"product_set_id"`
 		TechnologyId int64     `db:"technology_id"`
-		Length       float64   `db:"length"`
-		Width        float64   `db:"width"`
-		UnitPrice    float64   `db:"unit_price"`
+		Length       string    `db:"length"`
+		Width        string    `db:"width"`
+		UnitPrice    string    `db:"unit_price"`
 		Quantity     int64     `db:"quantity"`
 		CreateTime   time.Time `db:"create_time"`
 		UpdateTime   time.Time `db:"update_time"`

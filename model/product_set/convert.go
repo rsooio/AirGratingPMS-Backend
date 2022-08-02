@@ -10,7 +10,7 @@ func (m ProductSet) Rpc() *pb.ProductSetInfo {
 	return &pb.ProductSetInfo{
 		Id:      m.Id,
 		OrderId: m.OrderId,
-		Remark:  m.Remark.String,
+		Remark:  m.Remark,
 	}
 }
 

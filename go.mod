@@ -78,6 +78,7 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
+	github.com/shopspring/decimal v1.3.1
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
 	github.com/zeromicro/zero-contrib/zrpc/registry/consul v0.0.0-20220228111653-d672d81f39ab // indirect
 	github.com/zeromicro/zero-contrib/zrpc/registry/nacos v0.0.0-20220525162615-f10f16d580d6 // indirect
@@ -108,10 +109,10 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/api v0.22.9 // indirect
-	k8s.io/apimachinery v0.22.9 // indirect
+	k8s.io/apimachinery v0.22.9
 	k8s.io/client-go v0.22.9 // indirect
 	k8s.io/klog/v2 v2.40.1 // indirect
 	k8s.io/utils v0.0.0-20220706174534-f6158b442e7c // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.2.1
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )

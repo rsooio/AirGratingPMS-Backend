@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package productset;
+option go_package="./pb";
+
+message Empty {}
+
+service productset {
+    rpc Insert (ProductSetInfo) returns (InsertResp);
+    rpc Delete (DeleteReq) returns (Empty);
+    rpc Update (ProductSetInfo) returns (Empty);
+    // rpc CustomUpdate (ProductSetInfo) returns (Empty);
+    rpc FindOneById (FindOneByIdReq) returns (ProductSetInfo);
+    rpc FindListByOrder (FindListByOrderReq) returns (ProductSetList);
+
+    // rpc InsertXa (ProductSetInfo) returns (InsertResp);
+}
+
+message ProductSetInfo {
+    int64  Id                = 1;
+    int64  OrderId           = 2;
+    string Remark            = 3;
+}
+
+message InsertResp {
+    int64 Id = 1;
+}
+
+message DeleteReq {
+    int64 Id = 1;
+}
+
+message FindOneByIdReq {
+    int64 Id = 1;
+}
+
+message FindListByOrderReq {
+    int64 OrderId    = 1;
+    int32 PageSize   = 2;
+    int32 PageNumber = 3;
+}
+
+message ProductSetList {
+    int64                   Count = 1;
+    repeated ProductSetInfo List  = 2;
+}

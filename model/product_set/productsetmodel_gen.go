@@ -39,12 +39,12 @@ type (
 	}
 
 	ProductSet struct {
-		Id         int64          `db:"id"`
-		OrderId    int64          `db:"order_id"`
-		CreateTime time.Time      `db:"create_time"`
-		UpdateTime time.Time      `db:"update_time"`
-		Remark     sql.NullString `db:"remark"`
-		Version    int64          `db:"version"`
+		Id         int64     `db:"id"`
+		OrderId    int64     `db:"order_id"`
+		CreateTime time.Time `db:"create_time"`
+		UpdateTime time.Time `db:"update_time"`
+		Remark     string    `db:"remark"`
+		Version    int64     `db:"version"`
 	}
 )
 

@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package order;
+option go_package="./pb";
+
+message Empty {}
+
+service order {
+    rpc Insert (OrderInfo) returns (InsertResp);
+    rpc Delete (DeleteReq) returns (Empty);
+    rpc Update (OrderInfo) returns (Empty);
+    // rpc CustomUpdate (OrderInfo) returns (Empty);
+    rpc FindOneById (FindOneByIdReq) returns (OrderInfo);
+    rpc FindListByWorkshop (FindListByWorkshopReq) returns (OrderList);
+    rpc FindListByEnterprise (FindListByEnterpriseReq) returns (OrderList);
+
+    // rpc InsertXa (OrderInfo) returns (InsertResp);
+}
+
+message OrderInfo {
+    int64  Id                = 1;
+    int64  EnterpriseId      = 2;
+    int64  WorkshopId        = 3;
+    int64  ClientId          = 4;
+    int64  ProductionPlanId  = 5;
+    int64  State             = 6;
+    string Address           = 7;
+    string Linkman           = 8;
+    string PhoneNumber       = 9;
+    string Email             = 10;
+    string CorrespondingCode = 11;
+    string Remark            = 12;
+}
+
+message InsertResp {
+    int64 Id = 1;
+}
+
+message DeleteReq {
+    int64 Id = 1;
+}
+
+message FindOneByIdReq {
+    int64 Id = 1;
+}
+
+message FindOneByNameReq {
+    int64  EnterpriseId = 1;
+    string Username     = 2;
+}
+
+message FindListByWorkshopReq {
+    int64 EnterpriseId = 1;
+    int64 WorkshopId   = 2;
+    int32 PageSize     = 3;
+    int32 PageNumber   = 4;
+}
+
+message FindListByEnterpriseReq {
+    int64 EnterpriseId = 1;
+    int32 PageSize     = 2;
+    int32 PageNumber   = 3;
+}
+
+message OrderList {
+    int64              Count = 1;
+    repeated OrderInfo List  = 2;
+}

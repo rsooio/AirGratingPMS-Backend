@@ -22,13 +22,15 @@ var (
 	unitPriceRowsExpectAutoSet   = strings.Join(stringx.Remove(unitPriceFieldNames, "`id`", "`create_time`", "`update_time`"), ",")
 	unitPriceRowsWithPlaceHolder = strings.Join(stringx.Remove(unitPriceFieldNames, "`id`", "`create_time`", "`update_time`"), "=?,") + "=?"
 
-	cacheUnitPriceIdPrefix = "cache:unitPrice:id:"
+	cacheUnitPriceIdPrefix                                         = "cache:unitPrice:id:"
+	cacheUnitPriceEnterpriseIdWorkshopIdClientIdTechnologyIdPrefix = "cache:unitPrice:enterpriseId:workshopId:clientId:technologyId:"
 )
 
 type (
 	unitPriceModel interface {
 		Insert(ctx context.Context, data *UnitPrice) (sql.Result, error)
 		FindOne(ctx context.Context, id int64) (*UnitPrice, error)
+		FindOneByEnterpriseIdWorkshopIdClientIdTechnologyId(ctx context.Context, enterpriseId int64, workshopId int64, clientId int64, technologyId int64) (*UnitPrice, error)
 		Update(ctx context.Context, data *UnitPrice) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -60,11 +62,12 @@ func newUnitPriceModel(conn sqlx.SqlConn, c cache.CacheConf) *defaultUnitPriceMo
 }
 
 func (m *defaultUnitPriceModel) Insert(ctx context.Context, data *UnitPrice) (sql.Result, error) {
+	unitPriceEnterpriseIdWorkshopIdClientIdTechnologyIdKey := fmt.Sprintf("%s%v:%v:%v:%v", cacheUnitPriceEnterpriseIdWorkshopIdClientIdTechnologyIdPrefix, data.EnterpriseId, data.WorkshopId, data.ClientId, data.TechnologyId)
 	unitPriceIdKey := fmt.Sprintf("%s%v", cacheUnitPriceIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?)", m.table, unitPriceRowsExpectAutoSet)
 		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.TechnologyId, data.ClientId, data.UnitPrice, data.Remark, data.Version)
-	}, unitPriceIdKey)
+	}, unitPriceEnterpriseIdWorkshopIdClientIdTechnologyIdKey, unitPriceIdKey)
 	return ret, err
 }
 
@@ -85,21 +88,48 @@ func (m *defaultUnitPriceModel) FindOne(ctx context.Context, id int64) (*UnitPri
 	}
 }
 
+func (m *defaultUnitPriceModel) FindOneByEnterpriseIdWorkshopIdClientIdTechnologyId(ctx context.Context, enterpriseId int64, workshopId int64, clientId int64, technologyId int64) (*UnitPrice, error) {
+	unitPriceEnterpriseIdWorkshopIdClientIdTechnologyIdKey := fmt.Sprintf("%s%v:%v:%v:%v", cacheUnitPriceEnterpriseIdWorkshopIdClientIdTechnologyIdPrefix, enterpriseId, workshopId, clientId, technologyId)
+	var resp UnitPrice
+	err := m.QueryRowIndexCtx(ctx, &resp, unitPriceEnterpriseIdWorkshopIdClientIdTechnologyIdKey, m.formatPrimary, func(ctx context.Context, conn sqlx.SqlConn, v interface{}) (i interface{}, e error) {
+		query := fmt.Sprintf("select %s from %s where `enterprise_id` = ? and `workshop_id` = ? and `client_id` = ? and `technology_id` = ? limit 1", unitPriceRows, m.table)
+		if err := conn.QueryRowCtx(ctx, &resp, query, enterpriseId, workshopId, clientId, technologyId); err != nil {
+			return nil, err
+		}
+		return resp.Id, nil
+	}, m.queryPrimary)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
 func (m *defaultUnitPriceModel) Update(ctx context.Context, data *UnitPrice) error {
+	unitPriceEnterpriseIdWorkshopIdClientIdTechnologyIdKey := fmt.Sprintf("%s%v:%v:%v:%v", cacheUnitPriceEnterpriseIdWorkshopIdClientIdTechnologyIdPrefix, data.EnterpriseId, data.WorkshopId, data.ClientId, data.TechnologyId)
 	unitPriceIdKey := fmt.Sprintf("%s%v", cacheUnitPriceIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, unitPriceRowsWithPlaceHolder)
 		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.TechnologyId, data.ClientId, data.UnitPrice, data.Remark, data.Version, data.Id)
-	}, unitPriceIdKey)
+	}, unitPriceEnterpriseIdWorkshopIdClientIdTechnologyIdKey, unitPriceIdKey)
 	return err
 }
 
 func (m *defaultUnitPriceModel) Delete(ctx context.Context, id int64) error {
+	data, err := m.FindOne(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	unitPriceEnterpriseIdWorkshopIdClientIdTechnologyIdKey := fmt.Sprintf("%s%v:%v:%v:%v", cacheUnitPriceEnterpriseIdWorkshopIdClientIdTechnologyIdPrefix, data.EnterpriseId, data.WorkshopId, data.ClientId, data.TechnologyId)
 	unitPriceIdKey := fmt.Sprintf("%s%v", cacheUnitPriceIdPrefix, id)
-	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
 		return conn.ExecCtx(ctx, query, id)
-	}, unitPriceIdKey)
+	}, unitPriceEnterpriseIdWorkshopIdClientIdTechnologyIdKey, unitPriceIdKey)
 	return err
 }
 

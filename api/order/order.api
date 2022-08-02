@@ -9,15 +9,81 @@ info(
 )
 
 type (
-    CreateOrderReq {
-        WorkshopId  int64  `json:"workshop_id"`
-        ClientId    int64  `json:"client_id"`
-        Address     string `json:"address"`
-        Linkman     string `json:"linkman"`
-        PhoneNumber string `json:"phone_number"`
-        Email       string `json:"email"`
-        Remark      string `json:"remark"`
-    }
+	InsertOrderReq {
+		WorkshopId        int64  `json:"workshop_id,optional"`
+		ClientId          int64  `json:"client_id"`
+		Address           string `json:"address"`
+		Linkman           string `json:"linkman"`
+		PhoneNumber       string `json:"phone_number"`
+		Email             string `json:"email"`
+		CorrespondingCode string `json:"corresponding_code"`
+		Remark            string `json:"remark"`
+	}
+
+	InsertOrderReply {
+		Id      int64  `json:"id"`
+		Message string `json:"message"`
+	}
+
+	UpdateOrderInfoReq {
+		Id                int64  `json:"id"`
+		WorkshopId        int64  `json:"workshop_id,optional"`
+		ClientId          int64  `json:"client_id,optional"`
+		Address           string `json:"address,optional"`
+		Linkman           string `json:"linkman,optional"`
+		PhoneNumber       string `json:"phone_number,optional"`
+		Email             string `json:"email,optional"`
+		CorrespondingCode string `json:"corresponding_code"`
+		Remark            string `json:"remark,optional"`
+	}
+
+	UpdateOrderInfoReply {
+		Message       string   `json:"message"`
+		ChangedFields []string `json:"changed_fields"`
+	}
+
+	DeleteOrderReq {
+		Id int64 `json:"id"`
+	}
+
+	DeleteOrderReply {
+		Message string `json:"message"`
+	}
+
+	OrderInfo {
+		Id                int64  `json:"id"`
+		WorkshopId        int64  `json:"workshop_id,optional"`
+		ClientId          int64  `json:"client_id"`
+		Address           string `json:"address"`
+		Linkman           string `json:"linkman"`
+		PhoneNumber       string `json:"phone_number"`
+		Email             string `json:"email"`
+		CorrespondingCode string `json:"corresponding_code"`
+		Remark            string `json:"remark"`
+	}
+
+	GetOrderListByEnterpriseReq {
+		PageNumber int32 `json:"pn"`
+		PageSize   int32 `json:"ps"`
+	}
+
+	GetOrderListByEnterpriseReply {
+		Message   string      `json:"message"`
+		Count     int64       `json:"count"`
+		OrderList []OrderInfo `json:"order_list"`
+	}
+
+	GetOrderListByWorkshopReq {
+		WorkshopId int64 `json:"workshop_id,optional"`
+		PageNumber int32 `json:"pn"`
+		PageSize   int32 `json:"ps"`
+	}
+
+	GetOrderListByWorkshopReply {
+		Message   string      `json:"message"`
+		Count     int64       `json:"count"`
+		OrderList []OrderInfo `json:"order_list"`
+	}
 )
 
 @server(
@@ -25,18 +91,165 @@ type (
 	group: order
 )
 service order-api {
-    @handler CreateOrder
-	post /order (CreateOrderReq) returns(CreateOrderReply)
+	@handler InsertOrder
+	post /order (InsertOrderReq) returns(InsertOrderReply)
 	
 	@handler UpdateOrderInfo
-	put /order (UpdateOrderInfoReq) returns(UpdateOrderInfoReply)
-	
-	@handler PartialUpdateOrderInfo
-	patch /order (PartialUpdateOrderInfoReq) returns(PartialUpdateOrderInfoReply)
+	patch /order (UpdateOrderInfoReq) returns(UpdateOrderInfoReply)
 	
 	@handler DeleteOrder
 	delete /order (DeleteOrderReq) returns(DeleteOrderReply)
 	
-	@handler GetOrderList
-	get /order (GetOrderListReq) returns(GetOrderListReply)
+	@handler GetOrderListByEnterprise
+	get /order (GetOrderListByEnterpriseReq) returns(GetOrderListByEnterpriseReply)
+	
+	@handler GetOrderListByWorkshop
+	get /workshop/order (GetOrderListByWorkshopReq) returns(GetOrderListByWorkshopReply)
+}
+
+type (
+	InsertProductSetReq {
+		OrderId int64  `json:"order_id"`
+		Remark  string `json:"remark"`
+	}
+
+	InsertProductSetReply {
+		Id      int64  `json:"id"`
+		Message string `json:"message"`
+	}
+
+	DeleteProductSetReq {
+		Id int64 `json:"id"`
+	}
+
+	DeleteProductSetReply {
+		Message string `json:"message"`
+	}
+
+	UpdateProductSetReq {
+		Id     int64  `json:"id"`
+		Remark string `json:"remark,optional"`
+	}
+
+	UpdateProductSetReply {
+		Message       string   `json:"message"`
+		ChangedFields []string `json:"changed_fields"`
+	}
+
+	GetProductSetListByOrderReq {
+		OrderId    int64 `json:"order_id"`
+		PageNumber int32 `json:"pn"`
+		PageSize   int32 `json:"ps"`
+	}
+
+	ProductSetInfo {
+		Id     int64  `json:"id"`
+		Remark string `json:"remark"`
+	}
+
+	GetProductSetListByOrderReply {
+		Message        string           `json:"message"`
+		Count          int64            `json:"count"`
+		ProductSetList []ProductSetInfo `json:"product_set_list"`
+	}
+)
+
+@server(
+	jwt: Auth
+	group: product_set
+)
+service order-api {
+	@handler InsertProductSet
+	post /product-set(InsertProductSetReq) returns(InsertProductSetReply)
+	
+	@handler DeleteProductSet
+	delete /product-set(DeleteProductSetReq) returns(DeleteProductSetReply)
+	
+	@handler UpdateProductSet
+	patch /product-set(UpdateProductSetReq) returns(UpdateProductSetReply)
+	
+	@handler GetProductSetListByOrder
+	get /product-set(GetProductSetListByOrderReq) returns(GetProductSetListByOrderReply)
+}
+
+type (
+	InsertProductReq {
+		ProductSetId int64  `json:"product_set_id"`
+		TechnologyId int64  `json:"technology_id"`
+		Length       string `json:"length"`
+		Width        string `json:"width"`
+		UnitPrice    string `json:"unit_price"`
+		Quantity     int64  `json:"quantity"`
+		Remark       string `json:"remark"`
+	}
+
+	InsertProductReply {
+		Id      int64  `json:"id"`
+		Message string `json:"message"`
+	}
+
+	DeleteProductReq {
+		Id int64 `json:"id"`
+	}
+
+	DeleteProductReply {
+		Message string `json:"message"`
+	}
+
+	UpdateProductReq {
+		Id           int64  `json:"id"`
+		ProductSetId int64  `json:"product_set_id,optional"`
+		TechnologyId int64  `json:"technology_id,optional"`
+		Length       string `json:"length,optional"`
+		Width        string `json:"width,optional"`
+		UnitPrice    string `json:"unit_price,optional"`
+		Quantity     int64  `json:"quantity,optional"`
+		Remark       string `json:"remark,optional"`
+	}
+
+	UpdateProductReply {
+		Message       string   `json:"message"`
+		ChangedFields []string `json:"changed_fields"`
+	}
+
+	GetProductListByProductSetReq {
+		ProductSetId int64 `json:"product_set_id"`
+		PageNumber   int32 `json:"pn"`
+		PageSize     int32 `json:"ps"`
+	}
+
+	ProductInfo {
+		Id           int64  `json:"id"`
+		ProductSetId int64  `json:"product_set_id"`
+		TechnologyId int64  `json:"technology_id"`
+		Length       string `json:"length"`
+		Width        string `json:"width"`
+		UnitPrice    string `json:"unit_price"`
+		Quantity     int64  `json:"quantity"`
+		Remark       string `json:"remark"`
+	}
+
+	GetProductListByProductSetReply {
+		Message     string        `json:"message"`
+		Count       int64         `json:"count"`
+		ProductList []ProductInfo `json:"product_list"`
+	}
+)
+
+@server(
+	jwt: Auth
+	group: product
+)
+service order-api {
+	@handler InsertProduct
+	post /product(InsertProductReq) returns(InsertProductReply)
+	
+	@handler DeleteProduct
+	delete /product(DeleteProductReq) returns(DeleteProductReply)
+	
+	@handler UpdateProduct
+	patch /product(UpdateProductReq) returns(UpdateProductReply)
+	
+	@handler GetProductListByProductSet
+	get /product(GetProductListByProductSetReq) returns(GetProductListByProductSetReply)
 }
