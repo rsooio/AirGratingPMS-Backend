@@ -39,26 +39,21 @@ type (
 	}
 
 	Order struct {
-		Id                  int64          `db:"id"`
-		EnterpriseId        int64          `db:"enterprise_id"`
-		WorkshopId          int64          `db:"workshop_id"`
-		ClientId            int64          `db:"client_id"`
-		ProductionPlanId    sql.NullInt64  `db:"production_plan_id"`
-		State               int64          `db:"state"`
-		Address             sql.NullString `db:"address"`
-		Linkman             sql.NullString `db:"linkman"`
-		PhoneNumber         sql.NullString `db:"phone_number"`
-		Email               sql.NullString `db:"email"`
-		OrderTime           time.Time      `db:"order_time"`
-		StartProductionTime sql.NullTime   `db:"start_production_time"`
-		ProductionTime      sql.NullTime   `db:"production_time"`
-		DeliveryTime        sql.NullTime   `db:"delivery_time"`
-		PaymentTime         sql.NullTime   `db:"payment_time"`
-		CorrespondingCode   sql.NullString `db:"corresponding_code"`
-		CreateTime          time.Time      `db:"create_time"`
-		UpdateTime          time.Time      `db:"update_time"`
-		Remark              sql.NullString `db:"remark"`
-		Version             int64          `db:"version"`
+		Id                int64     `db:"id"`
+		EnterpriseId      int64     `db:"enterprise_id"`
+		WorkshopId        int64     `db:"workshop_id"`
+		ClientId          int64     `db:"client_id"`
+		ProductionPlanId  int64     `db:"production_plan_id"`
+		State             int64     `db:"state"`
+		Address           string    `db:"address"`
+		Linkman           string    `db:"linkman"`
+		PhoneNumber       string    `db:"phone_number"`
+		Email             string    `db:"email"`
+		CorrespondingCode string    `db:"corresponding_code"`
+		CreateTime        time.Time `db:"create_time"`
+		UpdateTime        time.Time `db:"update_time"`
+		Remark            string    `db:"remark"`
+		Version           int64     `db:"version"`
 	}
 )
 
@@ -72,8 +67,8 @@ func newOrderModel(conn sqlx.SqlConn, c cache.CacheConf) *defaultOrderModel {
 func (m *defaultOrderModel) Insert(ctx context.Context, data *Order) (sql.Result, error) {
 	orderIdKey := fmt.Sprintf("%s%v", cacheOrderIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, orderRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.ClientId, data.ProductionPlanId, data.State, data.Address, data.Linkman, data.PhoneNumber, data.Email, data.OrderTime, data.StartProductionTime, data.ProductionTime, data.DeliveryTime, data.PaymentTime, data.CorrespondingCode, data.Remark, data.Version)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, orderRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.ClientId, data.ProductionPlanId, data.State, data.Address, data.Linkman, data.PhoneNumber, data.Email, data.CorrespondingCode, data.Remark, data.Version)
 	}, orderIdKey)
 	return ret, err
 }
@@ -99,7 +94,7 @@ func (m *defaultOrderModel) Update(ctx context.Context, data *Order) error {
 	orderIdKey := fmt.Sprintf("%s%v", cacheOrderIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, orderRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.ClientId, data.ProductionPlanId, data.State, data.Address, data.Linkman, data.PhoneNumber, data.Email, data.OrderTime, data.StartProductionTime, data.ProductionTime, data.DeliveryTime, data.PaymentTime, data.CorrespondingCode, data.Remark, data.Version, data.Id)
+		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.ClientId, data.ProductionPlanId, data.State, data.Address, data.Linkman, data.PhoneNumber, data.Email, data.CorrespondingCode, data.Remark, data.Version, data.Id)
 	}, orderIdKey)
 	return err
 }

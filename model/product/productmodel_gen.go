@@ -39,19 +39,17 @@ type (
 	}
 
 	Product struct {
-		Id           int64          `db:"id"`
-		EnterpriseId int64          `db:"enterprise_id"`
-		WorkshopId   int64          `db:"workshop_id"`
-		ProductSetId int64          `db:"product_set_id"`
-		TechnologyId int64          `db:"technology_id"`
-		Length       float64        `db:"length"`
-		Width        float64        `db:"width"`
-		UnitPrice    float64        `db:"unit_price"`
-		Quantity     int64          `db:"quantity"`
-		CreateTime   time.Time      `db:"create_time"`
-		UpdateTime   time.Time      `db:"update_time"`
-		Remark       sql.NullString `db:"remark"`
-		Version      int64          `db:"version"`
+		Id           int64     `db:"id"`
+		ProductSetId int64     `db:"product_set_id"`
+		TechnologyId int64     `db:"technology_id"`
+		Length       float64   `db:"length"`
+		Width        float64   `db:"width"`
+		UnitPrice    float64   `db:"unit_price"`
+		Quantity     int64     `db:"quantity"`
+		CreateTime   time.Time `db:"create_time"`
+		UpdateTime   time.Time `db:"update_time"`
+		Remark       string    `db:"remark"`
+		Version      int64     `db:"version"`
 	}
 )
 
@@ -65,8 +63,8 @@ func newProductModel(conn sqlx.SqlConn, c cache.CacheConf) *defaultProductModel 
 func (m *defaultProductModel) Insert(ctx context.Context, data *Product) (sql.Result, error) {
 	productIdKey := fmt.Sprintf("%s%v", cacheProductIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, productRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.ProductSetId, data.TechnologyId, data.Length, data.Width, data.UnitPrice, data.Quantity, data.Remark, data.Version)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?)", m.table, productRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.ProductSetId, data.TechnologyId, data.Length, data.Width, data.UnitPrice, data.Quantity, data.Remark, data.Version)
 	}, productIdKey)
 	return ret, err
 }
@@ -92,7 +90,7 @@ func (m *defaultProductModel) Update(ctx context.Context, data *Product) error {
 	productIdKey := fmt.Sprintf("%s%v", cacheProductIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, productRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.ProductSetId, data.TechnologyId, data.Length, data.Width, data.UnitPrice, data.Quantity, data.Remark, data.Version, data.Id)
+		return conn.ExecCtx(ctx, query, data.ProductSetId, data.TechnologyId, data.Length, data.Width, data.UnitPrice, data.Quantity, data.Remark, data.Version, data.Id)
 	}, productIdKey)
 	return err
 }

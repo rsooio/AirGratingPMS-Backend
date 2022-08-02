@@ -39,14 +39,12 @@ type (
 	}
 
 	ProductSet struct {
-		Id           int64          `db:"id"`
-		EnterpriseId int64          `db:"enterprise_id"`
-		WorkshopId   int64          `db:"workshop_id"`
-		OrderId      int64          `db:"order_id"`
-		CreateTime   time.Time      `db:"create_time"`
-		UpdateTime   time.Time      `db:"update_time"`
-		Remark       sql.NullString `db:"remark"`
-		Version      int64          `db:"version"`
+		Id         int64          `db:"id"`
+		OrderId    int64          `db:"order_id"`
+		CreateTime time.Time      `db:"create_time"`
+		UpdateTime time.Time      `db:"update_time"`
+		Remark     sql.NullString `db:"remark"`
+		Version    int64          `db:"version"`
 	}
 )
 
@@ -60,8 +58,8 @@ func newProductSetModel(conn sqlx.SqlConn, c cache.CacheConf) *defaultProductSet
 func (m *defaultProductSetModel) Insert(ctx context.Context, data *ProductSet) (sql.Result, error) {
 	productSetIdKey := fmt.Sprintf("%s%v", cacheProductSetIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?)", m.table, productSetRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.OrderId, data.Remark, data.Version)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, productSetRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.OrderId, data.Remark, data.Version)
 	}, productSetIdKey)
 	return ret, err
 }
@@ -87,7 +85,7 @@ func (m *defaultProductSetModel) Update(ctx context.Context, data *ProductSet) e
 	productSetIdKey := fmt.Sprintf("%s%v", cacheProductSetIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, productSetRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.OrderId, data.Remark, data.Version, data.Id)
+		return conn.ExecCtx(ctx, query, data.OrderId, data.Remark, data.Version, data.Id)
 	}, productSetIdKey)
 	return err
 }
