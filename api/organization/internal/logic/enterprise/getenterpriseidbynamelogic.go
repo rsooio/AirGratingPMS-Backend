@@ -25,7 +25,7 @@ func NewGetEnterpriseIdByNameLogic(ctx context.Context, svcCtx *svc.ServiceConte
 }
 
 func (l *GetEnterpriseIdByNameLogic) GetEnterpriseIdByName(req *types.GetEnterpriseIdByNameReq) (resp *types.GetEnterpriseIdByNameReply, err error) {
-	info, err := l.svcCtx.EnterpriseRPC.FindOneByName(l.ctx, &pb.FindOneByNameReq{
+	info, err := l.svcCtx.EnterpriseRpc.FindOneByName(l.ctx, &pb.FindOneByNameReq{
 		Username: req.Name,
 	})
 

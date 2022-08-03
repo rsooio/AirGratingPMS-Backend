@@ -37,11 +37,6 @@ func (s *EnterpriseServer) Update(ctx context.Context, in *pb.EnterpriseInfo) (*
 	return l.Update(in)
 }
 
-func (s *EnterpriseServer) PartialUpdate(ctx context.Context, in *pb.EnterpriseInfo) (*pb.Empty, error) {
-	l := logic.NewPartialUpdateLogic(ctx, s.svcCtx)
-	return l.PartialUpdate(in)
-}
-
 func (s *EnterpriseServer) FindOneByName(ctx context.Context, in *pb.FindOneByNameReq) (*pb.EnterpriseInfo, error) {
 	l := logic.NewFindOneByNameLogic(ctx, s.svcCtx)
 	return l.FindOneByName(in)

@@ -25,7 +25,6 @@ type EnterpriseClient interface {
 	Insert(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*InsertResp, error)
 	Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*Empty, error)
 	Update(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error)
-	PartialUpdate(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error)
 	FindOneByName(ctx context.Context, in *FindOneByNameReq, opts ...grpc.CallOption) (*EnterpriseInfo, error)
 	InsertXa(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*InsertResp, error)
 }
@@ -65,15 +64,6 @@ func (c *enterpriseClient) Update(ctx context.Context, in *EnterpriseInfo, opts 
 	return out, nil
 }
 
-func (c *enterpriseClient) PartialUpdate(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/enterprise.enterprise/PartialUpdate", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *enterpriseClient) FindOneByName(ctx context.Context, in *FindOneByNameReq, opts ...grpc.CallOption) (*EnterpriseInfo, error) {
 	out := new(EnterpriseInfo)
 	err := c.cc.Invoke(ctx, "/enterprise.enterprise/FindOneByName", in, out, opts...)
@@ -99,7 +89,6 @@ type EnterpriseServer interface {
 	Insert(context.Context, *EnterpriseInfo) (*InsertResp, error)
 	Delete(context.Context, *DeleteReq) (*Empty, error)
 	Update(context.Context, *EnterpriseInfo) (*Empty, error)
-	PartialUpdate(context.Context, *EnterpriseInfo) (*Empty, error)
 	FindOneByName(context.Context, *FindOneByNameReq) (*EnterpriseInfo, error)
 	InsertXa(context.Context, *EnterpriseInfo) (*InsertResp, error)
 	mustEmbedUnimplementedEnterpriseServer()
@@ -117,9 +106,6 @@ func (UnimplementedEnterpriseServer) Delete(context.Context, *DeleteReq) (*Empty
 }
 func (UnimplementedEnterpriseServer) Update(context.Context, *EnterpriseInfo) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
-}
-func (UnimplementedEnterpriseServer) PartialUpdate(context.Context, *EnterpriseInfo) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PartialUpdate not implemented")
 }
 func (UnimplementedEnterpriseServer) FindOneByName(context.Context, *FindOneByNameReq) (*EnterpriseInfo, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindOneByName not implemented")
@@ -194,24 +180,6 @@ func _Enterprise_Update_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Enterprise_PartialUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EnterpriseInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(EnterpriseServer).PartialUpdate(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/enterprise.enterprise/PartialUpdate",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EnterpriseServer).PartialUpdate(ctx, req.(*EnterpriseInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Enterprise_FindOneByName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(FindOneByNameReq)
 	if err := dec(in); err != nil {
@@ -266,10 +234,6 @@ var Enterprise_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Update",
 			Handler:    _Enterprise_Update_Handler,
-		},
-		{
-			MethodName: "PartialUpdate",
-			Handler:    _Enterprise_PartialUpdate_Handler,
 		},
 		{
 			MethodName: "FindOneByName",

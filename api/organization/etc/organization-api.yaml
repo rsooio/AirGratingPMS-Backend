@@ -1,22 +1,22 @@
 Name: organization-api
 Host: 0.0.0.0
 Port: 33012
-AuthRPC:
+AuthRpc:
   Etcd:
     Hosts:
       - 127.0.0.1:2379
     Key: authentication.rpc
-StafferRPC:
+StafferRpc:
   Etcd:
     Hosts:
     - 127.0.0.1:2379
     Key: staffer.rpc
-WorkshopRPC:
+WorkshopRpc:
   Etcd:
     Hosts:
     - 127.0.0.1:2379
     Key: workshop.rpc
-EnterpriseRPC:
+EnterpriseRpc:
   Etcd:
     Hosts:
       - 127.0.0.1:2379

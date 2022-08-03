@@ -41,16 +41,16 @@ type (
 	}
 
 	Workshop struct {
-		Id           int64          `db:"id"`
-		EnterpriseId int64          `db:"enterprise_id"`
-		Name         string         `db:"name"`
-		Address      sql.NullString `db:"address"`
-		PhoneNumber  sql.NullString `db:"phone_number"`
-		ManagerId    sql.NullInt64  `db:"manager_id"`
-		CreateTime   time.Time      `db:"create_time"`
-		UpdateTime   time.Time      `db:"update_time"`
-		Remark       sql.NullString `db:"remark"`
-		Version      int64          `db:"version"`
+		Id           int64     `db:"id"`
+		EnterpriseId int64     `db:"enterprise_id"`
+		Name         string    `db:"name"`
+		Address      string    `db:"address"`
+		PhoneNumber  string    `db:"phone_number"`
+		ManagerId    int64     `db:"manager_id"`
+		CreateTime   time.Time `db:"create_time"`
+		UpdateTime   time.Time `db:"update_time"`
+		Remark       string    `db:"remark"`
+		Version      int64     `db:"version"`
 	}
 )
 

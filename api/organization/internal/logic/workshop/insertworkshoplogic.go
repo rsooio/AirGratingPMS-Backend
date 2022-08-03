@@ -11,22 +11,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type CreateWorkshopLogic struct {
+type InsertWorkshopLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewCreateWorkshopLogic(ctx context.Context, svcCtx *svc.ServiceContext) *CreateWorkshopLogic {
-	return &CreateWorkshopLogic{
+func NewInsertWorkshopLogic(ctx context.Context, svcCtx *svc.ServiceContext) *InsertWorkshopLogic {
+	return &InsertWorkshopLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *CreateWorkshopLogic) CreateWorkshop(req *types.CreateWorkshopReq) (resp *types.CreateWorkshopReply, err error) {
-	_, err = l.svcCtx.WorkshopRPC.Insert(l.ctx, &pb.WorkshopInfo{
+func (l *InsertWorkshopLogic) InsertWorkshop(req *types.InsertWorkshopReq) (resp *types.InsertWorkshopReply, err error) {
+	info, err := l.svcCtx.WorkshopRpc.Insert(l.ctx, &pb.WorkshopInfo{
 		EnterpriseId: utils.GetEnterpriseId(l.ctx),
 		ManagerId:    req.ManagerId,
 		Name:         req.Name,
@@ -35,7 +35,8 @@ func (l *CreateWorkshopLogic) CreateWorkshop(req *types.CreateWorkshopReq) (resp
 		Remark:       req.Remark,
 	})
 
-	return &types.CreateWorkshopReply{
+	return &types.InsertWorkshopReply{
+		Id:      info.Id,
 		Message: "OK",
 	}, err
 }

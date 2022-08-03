@@ -22,10 +22,9 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type WorkshopClient interface {
-	Insert(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error)
+	Insert(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*InsertResp, error)
 	Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*Empty, error)
 	Update(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error)
-	PartialUpdate(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error)
 	FindListByEnterprise(ctx context.Context, in *FindListByEnterpriseReq, opts ...grpc.CallOption) (*WorkshopList, error)
 }
 
@@ -37,8 +36,8 @@ func NewWorkshopClient(cc grpc.ClientConnInterface) WorkshopClient {
 	return &workshopClient{cc}
 }
 
-func (c *workshopClient) Insert(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *workshopClient) Insert(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*InsertResp, error) {
+	out := new(InsertResp)
 	err := c.cc.Invoke(ctx, "/workshop.workshop/Insert", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -64,15 +63,6 @@ func (c *workshopClient) Update(ctx context.Context, in *WorkshopInfo, opts ...g
 	return out, nil
 }
 
-func (c *workshopClient) PartialUpdate(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, "/workshop.workshop/PartialUpdate", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *workshopClient) FindListByEnterprise(ctx context.Context, in *FindListByEnterpriseReq, opts ...grpc.CallOption) (*WorkshopList, error) {
 	out := new(WorkshopList)
 	err := c.cc.Invoke(ctx, "/workshop.workshop/FindListByEnterprise", in, out, opts...)
@@ -86,10 +76,9 @@ func (c *workshopClient) FindListByEnterprise(ctx context.Context, in *FindListB
 // All implementations must embed UnimplementedWorkshopServer
 // for forward compatibility
 type WorkshopServer interface {
-	Insert(context.Context, *WorkshopInfo) (*Empty, error)
+	Insert(context.Context, *WorkshopInfo) (*InsertResp, error)
 	Delete(context.Context, *DeleteReq) (*Empty, error)
 	Update(context.Context, *WorkshopInfo) (*Empty, error)
-	PartialUpdate(context.Context, *WorkshopInfo) (*Empty, error)
 	FindListByEnterprise(context.Context, *FindListByEnterpriseReq) (*WorkshopList, error)
 	mustEmbedUnimplementedWorkshopServer()
 }
@@ -98,7 +87,7 @@ type WorkshopServer interface {
 type UnimplementedWorkshopServer struct {
 }
 
-func (UnimplementedWorkshopServer) Insert(context.Context, *WorkshopInfo) (*Empty, error) {
+func (UnimplementedWorkshopServer) Insert(context.Context, *WorkshopInfo) (*InsertResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Insert not implemented")
 }
 func (UnimplementedWorkshopServer) Delete(context.Context, *DeleteReq) (*Empty, error) {
@@ -106,9 +95,6 @@ func (UnimplementedWorkshopServer) Delete(context.Context, *DeleteReq) (*Empty, 
 }
 func (UnimplementedWorkshopServer) Update(context.Context, *WorkshopInfo) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
-}
-func (UnimplementedWorkshopServer) PartialUpdate(context.Context, *WorkshopInfo) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PartialUpdate not implemented")
 }
 func (UnimplementedWorkshopServer) FindListByEnterprise(context.Context, *FindListByEnterpriseReq) (*WorkshopList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindListByEnterprise not implemented")
@@ -180,24 +166,6 @@ func _Workshop_Update_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Workshop_PartialUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(WorkshopInfo)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(WorkshopServer).PartialUpdate(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/workshop.workshop/PartialUpdate",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WorkshopServer).PartialUpdate(ctx, req.(*WorkshopInfo))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _Workshop_FindListByEnterprise_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(FindListByEnterpriseReq)
 	if err := dec(in); err != nil {
@@ -234,10 +202,6 @@ var Workshop_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Update",
 			Handler:    _Workshop_Update_Handler,
-		},
-		{
-			MethodName: "PartialUpdate",
-			Handler:    _Workshop_PartialUpdate_Handler,
 		},
 		{
 			MethodName: "FindListByEnterprise",

@@ -17,17 +17,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodPost,
 				Path:    "/workshop",
-				Handler: workshop.CreateWorkshopHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPut,
-				Path:    "/workshop",
-				Handler: workshop.ChangeWorkshopInfoHandler(serverCtx),
+				Handler: workshop.InsertWorkshopHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPatch,
 				Path:    "/workshop",
-				Handler: workshop.PartialChangeWorkshopInfoHandler(serverCtx),
+				Handler: workshop.UpdateWorkshopInfoHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodDelete,
@@ -37,33 +32,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodGet,
 				Path:    "/workshop",
-				Handler: workshop.RetrieveWorkshopHandler(serverCtx),
-			},
-		},
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
-	)
-
-	server.AddRoutes(
-		[]rest.Route{
-			{
-				Method:  http.MethodPut,
-				Path:    "/enterprise",
-				Handler: enterprise.ChangeEnterpriseInfoHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPatch,
-				Path:    "/enterprise",
-				Handler: enterprise.PartialChangeEnterpriseInfoHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodDelete,
-				Path:    "/enterprise",
-				Handler: enterprise.DeleteEnterpriseHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodGet,
-				Path:    "/enterprise",
-				Handler: enterprise.GetEnterpriseIdByNameHandler(serverCtx),
+				Handler: workshop.GetWorkshopListHandler(serverCtx),
 			},
 		},
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
@@ -77,5 +46,26 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: enterprise.CreateEnterpriseHandler(serverCtx),
 			},
 		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodPatch,
+				Path:    "/enterprise",
+				Handler: enterprise.UpdateEnterpriseInfoHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodDelete,
+				Path:    "/enterprise",
+				Handler: enterprise.DeleteEnterpriseHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/enterprise",
+				Handler: enterprise.GetEnterpriseIdByNameHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 	)
 }

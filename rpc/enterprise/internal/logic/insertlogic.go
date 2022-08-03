@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"database/sql"
 
 	"air-grating-pms-backend/model/enterprise"
 	"air-grating-pms-backend/rpc/enterprise/internal/svc"
@@ -27,10 +26,10 @@ func NewInsertLogic(ctx context.Context, svcCtx *svc.ServiceContext) *InsertLogi
 
 func (l *InsertLogic) Insert(in *pb.EnterpriseInfo) (*pb.InsertResp, error) {
 	result, err := l.svcCtx.EnterpriseModel.Insert(l.ctx, &enterprise.Enterprise{
-		Name:    in.GetName(),
-		Address: sql.NullString{String: in.GetAddress(), Valid: in.GetAddress() != ""},
-		Remark:  sql.NullString{String: in.GetRemark(), Valid: in.GetRemark() != ""},
-		Version: in.GetVersion(),
+		Name:    in.Name,
+		Address: in.Address,
+		Remark:  in.Remark,
+		Version: in.Version,
 	})
 	if err != nil {
 		return nil, err

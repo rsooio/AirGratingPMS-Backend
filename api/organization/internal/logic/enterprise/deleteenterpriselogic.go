@@ -25,8 +25,8 @@ func NewDeleteEnterpriseLogic(ctx context.Context, svcCtx *svc.ServiceContext) *
 	}
 }
 
-func (l *DeleteEnterpriseLogic) DeleteEnterprise() (resp *types.DeleteEnterpriseReply, err error) {
-	_, err = l.svcCtx.EnterpriseRPC.Delete(l.ctx, &pb.DeleteReq{
+func (l *DeleteEnterpriseLogic) DeleteEnterprise(req *types.DeleteEnterpriseReq) (resp *types.DeleteEnterpriseReply, err error) {
+	_, err = l.svcCtx.EnterpriseRpc.Delete(l.ctx, &pb.DeleteReq{
 		Id: utils.GetEnterpriseId(l.ctx),
 	})
 

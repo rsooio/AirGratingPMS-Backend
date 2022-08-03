@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"database/sql"
 
 	"air-grating-pms-backend/model/enterprise"
 	"air-grating-pms-backend/rpc/enterprise/internal/svc"
@@ -27,10 +26,10 @@ func NewUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateLogi
 
 func (l *UpdateLogic) Update(in *pb.EnterpriseInfo) (*pb.Empty, error) {
 	return &pb.Empty{}, l.svcCtx.EnterpriseModel.Update(l.ctx, &enterprise.Enterprise{
-		Id:      in.GetId(),
-		Name:    in.GetName(),
-		Address: sql.NullString{String: in.GetAddress(), Valid: true},
-		Remark:  sql.NullString{String: in.GetRemark(), Valid: true},
-		Version: in.GetVersion(),
+		Id:      in.Id,
+		Name:    in.Name,
+		Address: in.Address,
+		Remark:  in.Remark,
+		Version: in.Version,
 	})
 }

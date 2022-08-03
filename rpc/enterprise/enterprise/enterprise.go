@@ -23,7 +23,6 @@ type (
 		Insert(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*InsertResp, error)
 		Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*Empty, error)
 		Update(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error)
-		PartialUpdate(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error)
 		FindOneByName(ctx context.Context, in *FindOneByNameReq, opts ...grpc.CallOption) (*EnterpriseInfo, error)
 		InsertXa(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*InsertResp, error)
 	}
@@ -52,11 +51,6 @@ func (m *defaultEnterprise) Delete(ctx context.Context, in *DeleteReq, opts ...g
 func (m *defaultEnterprise) Update(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error) {
 	client := pb.NewEnterpriseClient(m.cli.Conn())
 	return client.Update(ctx, in, opts...)
-}
-
-func (m *defaultEnterprise) PartialUpdate(ctx context.Context, in *EnterpriseInfo, opts ...grpc.CallOption) (*Empty, error) {
-	client := pb.NewEnterpriseClient(m.cli.Conn())
-	return client.PartialUpdate(ctx, in, opts...)
 }
 
 func (m *defaultEnterprise) FindOneByName(ctx context.Context, in *FindOneByNameReq, opts ...grpc.CallOption) (*EnterpriseInfo, error) {

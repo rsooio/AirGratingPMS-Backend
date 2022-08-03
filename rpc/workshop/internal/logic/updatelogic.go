@@ -2,7 +2,6 @@ package logic
 
 import (
 	"context"
-	"database/sql"
 
 	"air-grating-pms-backend/model/workshop"
 	"air-grating-pms-backend/rpc/workshop/internal/svc"
@@ -27,13 +26,13 @@ func NewUpdateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateLogi
 
 func (l *UpdateLogic) Update(in *pb.WorkshopInfo) (*pb.Empty, error) {
 	return &pb.Empty{}, l.svcCtx.WorkshopModel.Update(l.ctx, &workshop.Workshop{
-		Id:           in.GetId(),
-		EnterpriseId: in.GetEnterpriseId(),
-		Name:         in.GetName(),
-		Address:      sql.NullString{String: in.GetAddress(), Valid: true},
-		PhoneNumber:  sql.NullString{String: in.GetPhoneNumber(), Valid: true},
-		ManagerId:    sql.NullInt64{Int64: in.GetManagerId(), Valid: true},
-		Remark:       sql.NullString{String: in.GetRemark(), Valid: true},
-		Version:      in.GetVersion(),
+		Id:           in.Id,
+		EnterpriseId: in.EnterpriseId,
+		Name:         in.Name,
+		Address:      in.Address,
+		PhoneNumber:  in.PhoneNumber,
+		ManagerId:    in.ManagerId,
+		Remark:       in.Remark,
+		Version:      in.Version,
 	})
 }

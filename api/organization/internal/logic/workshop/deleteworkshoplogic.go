@@ -25,7 +25,7 @@ func NewDeleteWorkshopLogic(ctx context.Context, svcCtx *svc.ServiceContext) *De
 }
 
 func (l *DeleteWorkshopLogic) DeleteWorkshop(req *types.DeleteWorkshopReq) (resp *types.DeleteWorkshopReply, err error) {
-	_, err = l.svcCtx.WorkshopRPC.Delete(l.ctx, &pb.DeleteReq{Id: req.Id})
+	_, err = l.svcCtx.WorkshopRpc.Delete(l.ctx, &pb.DeleteReq{Id: req.Id})
 
 	return &types.DeleteWorkshopReply{
 		Message: "OK",

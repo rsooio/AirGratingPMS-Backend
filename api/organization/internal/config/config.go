@@ -9,10 +9,10 @@ import (
 type Config struct {
 	rest.RestConf
 
-	AuthRPC       zrpc.RpcClientConf
-	StafferRPC    zrpc.RpcClientConf
-	WorkshopRPC   zrpc.RpcClientConf
-	EnterpriseRPC zrpc.RpcClientConf
+	AuthRpc       zrpc.RpcClientConf
+	StafferRpc    zrpc.RpcClientConf
+	WorkshopRpc   zrpc.RpcClientConf
+	EnterpriseRpc zrpc.RpcClientConf
 	CacheRedis    cache.CacheConf
 
 	Auth struct {

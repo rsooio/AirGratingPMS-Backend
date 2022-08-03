@@ -16,14 +16,14 @@ type (
 	DeleteReq               = pb.DeleteReq
 	Empty                   = pb.Empty
 	FindListByEnterpriseReq = pb.FindListByEnterpriseReq
+	InsertResp              = pb.InsertResp
 	WorkshopInfo            = pb.WorkshopInfo
 	WorkshopList            = pb.WorkshopList
 
 	Workshop interface {
-		Insert(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error)
+		Insert(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*InsertResp, error)
 		Delete(ctx context.Context, in *DeleteReq, opts ...grpc.CallOption) (*Empty, error)
 		Update(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error)
-		PartialUpdate(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error)
 		FindListByEnterprise(ctx context.Context, in *FindListByEnterpriseReq, opts ...grpc.CallOption) (*WorkshopList, error)
 	}
 
@@ -38,7 +38,7 @@ func NewWorkshop(cli zrpc.Client) Workshop {
 	}
 }
 
-func (m *defaultWorkshop) Insert(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error) {
+func (m *defaultWorkshop) Insert(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*InsertResp, error) {
 	client := pb.NewWorkshopClient(m.cli.Conn())
 	return client.Insert(ctx, in, opts...)
 }
@@ -51,11 +51,6 @@ func (m *defaultWorkshop) Delete(ctx context.Context, in *DeleteReq, opts ...grp
 func (m *defaultWorkshop) Update(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error) {
 	client := pb.NewWorkshopClient(m.cli.Conn())
 	return client.Update(ctx, in, opts...)
-}
-
-func (m *defaultWorkshop) PartialUpdate(ctx context.Context, in *WorkshopInfo, opts ...grpc.CallOption) (*Empty, error) {
-	client := pb.NewWorkshopClient(m.cli.Conn())
-	return client.PartialUpdate(ctx, in, opts...)
 }
 
 func (m *defaultWorkshop) FindListByEnterprise(ctx context.Context, in *FindListByEnterpriseReq, opts ...grpc.CallOption) (*WorkshopList, error) {

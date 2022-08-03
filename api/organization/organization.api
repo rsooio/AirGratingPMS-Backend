@@ -9,16 +9,7 @@ info(
 )
 
 type (
-	Workshop {
-		Id          int64  `json:"id"`
-		Name        string `json:"name"`
-		Address     string `json:"address"`
-		PhoneNumber string `json:"phone_number"`
-		ManagerId   int64  `json:"manager_id"`
-		Remark      string `json:"remark"`
-	}
-
-	CreateWorkshopReq {
+	InsertWorkshopReq {
 		Name        string `json:"name"`
 		Address     string `json:"address,optional"`
 		PhoneNumber string `json:"phone_number,optional"`
@@ -26,24 +17,12 @@ type (
 		Remark      string `json:"remark,optional"`
 	}
 
-	CreateWorkshopReply {
+	InsertWorkshopReply {
+		Id      int64  `json:"id"`
 		Message string `json:"message"`
 	}
 
-	ChangeWorkshopInfoReq {
-		Id          int64  `json:"id"`
-		Name        string `json:"name"`
-		Address     string `json:"address"`
-		PhoneNumber string `json:"phone_number"`
-		ManagerId   int64  `json:"manager_id"`
-		Remark      string `json:"remark"`
-	}
-
-	ChangeWorkshopInfoReply {
-		Message string `json:"message"`
-	}
-
-	PartialChangeWorkshopInfoReq {
+	UpdateWorkshopInfoReq {
 		Id          int64  `json:"id"`
 		Name        string `json:"name,optional"`
 		Address     string `json:"address,optional"`
@@ -52,7 +31,7 @@ type (
 		Remark      string `json:"remark,optional"`
 	}
 
-	PartialChangeWorkshopInfoReply {
+	UpdateWorkshopInfoReply {
 		Message       string   `json:"message"`
 		ChangedFields []string `json:"changed_fields"`
 	}
@@ -65,14 +44,23 @@ type (
 		Message string `json:"message"`
 	}
 
-	RetrieveWorkshopReq {
-		PageNumber int `json:"pn"`
-		PageSize   int `json:"ps"`
+	WorkshopInfo {
+		Id          int64  `json:"id"`
+		Name        string `json:"name"`
+		Address     string `json:"address"`
+		PhoneNumber string `json:"phone_number"`
+		ManagerId   int64  `json:"manager_id"`
+		Remark      string `json:"remark"`
 	}
 
-	RetrieveWorkshopReply {
-		Message      string     `json:"message"`
-		WorkshopList []Workshop `json:"workshop_list"`
+	GetWorkshopListReq {
+		PageNumber int32 `json:"pn"`
+		PageSize   int32 `json:"ps"`
+	}
+
+	GetWorkshopListReply {
+		Message      string         `json:"message"`
+		WorkshopList []WorkshopInfo `json:"workshop_list"`
 	}
 )
 
@@ -81,20 +69,17 @@ type (
 	group: workshop
 )
 service organization-api {
-	@handler CreateWorkshop
-	post /workshop (CreateWorkshopReq) returns(CreateWorkshopReply)
+	@handler InsertWorkshop
+	post /workshop (InsertWorkshopReq) returns(InsertWorkshopReply)
 	
-	@handler ChangeWorkshopInfo
-	put /workshop (ChangeWorkshopInfoReq) returns(ChangeWorkshopInfoReply)
-	
-	@handler PartialChangeWorkshopInfo
-	patch /workshop (PartialChangeWorkshopInfoReq) returns(PartialChangeWorkshopInfoReply)
+	@handler UpdateWorkshopInfo
+	patch /workshop (UpdateWorkshopInfoReq) returns(UpdateWorkshopInfoReply)
 	
 	@handler DeleteWorkshop
 	delete /workshop (DeleteWorkshopReq) returns(DeleteWorkshopReply)
 	
-	@handler RetrieveWorkshop
-	get /workshop (RetrieveWorkshopReq) returns(RetrieveWorkshopReply)
+	@handler GetWorkshopList
+	get /workshop (GetWorkshopListReq) returns(GetWorkshopListReply)
 }
 
 type (
@@ -107,28 +92,23 @@ type (
 	}
 
 	CreateEnterpriseReply {
+		Id      int64  `json:"id"`
 		Message string `json:"message"`
 	}
 
-	ChangeEnterpriseInfoReq {
-		Name    string `json:"name"`
-		Address string `json:"address"`
-		Remark  string `json:"remark"`
-	}
-
-	ChangeEnterpriseInfoReply {
-		Message string `json:"message"`
-	}
-
-	PartialChangeEnterpriseInfoReq {
+	UpdateEnterpriseInfoReq {
 		Name    string `json:"name,optional"`
 		Address string `json:"address,optional"`
 		Remark  string `json:"remark,optional"`
 	}
 
-	PartialChangeEnterpriseInfoReply {
+	UpdateEnterpriseInfoReply {
 		Message       string   `json:"message"`
 		ChangedFields []string `json:"changed_fields"`
+	}
+
+	DeleteEnterpriseReq {
+		Password string `json:"password"`
 	}
 
 	DeleteEnterpriseReply {
@@ -145,27 +125,24 @@ type (
 )
 
 @server(
-	jwt: Auth
-	group: enterprise
-)
-service organization-api {
-	@handler ChangeEnterpriseInfo
-	put /enterprise (ChangeEnterpriseInfoReq) returns(ChangeEnterpriseInfoReply)
-	
-	@handler PartialChangeEnterpriseInfo
-	patch /enterprise (PartialChangeEnterpriseInfoReq) returns(PartialChangeEnterpriseInfoReply)
-	
-	@handler DeleteEnterprise
-	delete /enterprise returns(DeleteEnterpriseReply)
-	
-	@handler GetEnterpriseIdByName
-	get /enterprise (GetEnterpriseIdByNameReq) returns(GetEnterpriseIdByNameReply)
-}
-
-@server(
 	group: enterprise
 )
 service organization-api {
 	@handler CreateEnterprise
 	post /enterprise (CreateEnterpriseReq) returns(CreateEnterpriseReply)
+}
+
+@server(
+	jwt: Auth
+	group: enterprise
+)
+service organization-api {
+	@handler UpdateEnterpriseInfo
+	patch /enterprise (UpdateEnterpriseInfoReq) returns(UpdateEnterpriseInfoReply)
+	
+	@handler DeleteEnterprise
+	delete /enterprise (DeleteEnterpriseReq) returns(DeleteEnterpriseReply)
+	
+	@handler GetEnterpriseIdByName
+	get /enterprise (GetEnterpriseIdByNameReq) returns(GetEnterpriseIdByNameReply)
 }

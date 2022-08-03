@@ -41,14 +41,14 @@ type (
 	}
 
 	DeletedEnterprise struct {
-		Id         int64          `db:"id"`
-		Name       string         `db:"name"`
-		Address    sql.NullString `db:"address"`
-		InsertTime sql.NullTime   `db:"insert_time"`
-		CreateTime time.Time      `db:"create_time"`
-		UpdateTime time.Time      `db:"update_time"`
-		Remark     sql.NullString `db:"remark"`
-		Version    int64          `db:"version"`
+		Id         int64        `db:"id"`
+		Name       string       `db:"name"`
+		Address    string       `db:"address"`
+		InsertTime sql.NullTime `db:"insert_time"`
+		CreateTime time.Time    `db:"create_time"`
+		UpdateTime time.Time    `db:"update_time"`
+		Remark     string       `db:"remark"`
+		Version    int64        `db:"version"`
 	}
 )
 

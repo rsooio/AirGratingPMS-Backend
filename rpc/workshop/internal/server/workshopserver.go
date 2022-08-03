@@ -22,7 +22,7 @@ func NewWorkshopServer(svcCtx *svc.ServiceContext) *WorkshopServer {
 	}
 }
 
-func (s *WorkshopServer) Insert(ctx context.Context, in *pb.WorkshopInfo) (*pb.Empty, error) {
+func (s *WorkshopServer) Insert(ctx context.Context, in *pb.WorkshopInfo) (*pb.InsertResp, error) {
 	l := logic.NewInsertLogic(ctx, s.svcCtx)
 	return l.Insert(in)
 }
@@ -35,11 +35,6 @@ func (s *WorkshopServer) Delete(ctx context.Context, in *pb.DeleteReq) (*pb.Empt
 func (s *WorkshopServer) Update(ctx context.Context, in *pb.WorkshopInfo) (*pb.Empty, error) {
 	l := logic.NewUpdateLogic(ctx, s.svcCtx)
 	return l.Update(in)
-}
-
-func (s *WorkshopServer) PartialUpdate(ctx context.Context, in *pb.WorkshopInfo) (*pb.Empty, error) {
-	l := logic.NewPartialUpdateLogic(ctx, s.svcCtx)
-	return l.PartialUpdate(in)
 }
 
 func (s *WorkshopServer) FindListByEnterprise(ctx context.Context, in *pb.FindListByEnterpriseReq) (*pb.WorkshopList, error) {

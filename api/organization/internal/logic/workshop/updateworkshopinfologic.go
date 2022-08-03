@@ -6,29 +6,28 @@ import (
 	"air-grating-pms-backend/api/organization/internal/svc"
 	"air-grating-pms-backend/api/organization/internal/types"
 	"air-grating-pms-backend/rpc/workshop/pb"
-	"air-grating-pms-backend/utils"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type PartialChangeWorkshopInfoLogic struct {
+type UpdateWorkshopInfoLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewPartialChangeWorkshopInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PartialChangeWorkshopInfoLogic {
-	return &PartialChangeWorkshopInfoLogic{
+func NewUpdateWorkshopInfoLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UpdateWorkshopInfoLogic {
+	return &UpdateWorkshopInfoLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *PartialChangeWorkshopInfoLogic) PartialChangeWorkshopInfo(req *types.PartialChangeWorkshopInfoReq) (resp *types.PartialChangeWorkshopInfoReply, err error) {
-	_, err = l.svcCtx.WorkshopRPC.PartialUpdate(l.ctx, &pb.WorkshopInfo{
+func (l *UpdateWorkshopInfoLogic) UpdateWorkshopInfo(req *types.UpdateWorkshopInfoReq) (resp *types.UpdateWorkshopInfoReply, err error) {
+	_, err = l.svcCtx.WorkshopRpc.Update(l.ctx, &pb.WorkshopInfo{
 		Id:           req.Id,
-		EnterpriseId: utils.GetEnterpriseId(l.ctx),
+		EnterpriseId: l.ctx.Value("ent").(int64),
 		ManagerId:    req.ManagerId,
 		Name:         req.Name,
 		Address:      req.Address,
@@ -36,9 +35,8 @@ func (l *PartialChangeWorkshopInfoLogic) PartialChangeWorkshopInfo(req *types.Pa
 		Remark:       req.Remark,
 	})
 
-	return &types.PartialChangeWorkshopInfoReply{
-		Message: "OK",
-		// todo
+	return &types.UpdateWorkshopInfoReply{
+		Message:       "OK",
 		ChangedFields: []string{},
 	}, err
 }

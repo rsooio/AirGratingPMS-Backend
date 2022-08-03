@@ -9,7 +9,6 @@ service enterprise {
     rpc Insert (EnterpriseInfo) returns (InsertResp);
     rpc Delete (DeleteReq) returns (Empty);
     rpc Update (EnterpriseInfo) returns (Empty);
-    rpc PartialUpdate (EnterpriseInfo) returns (Empty);
     rpc FindOneByName (FindOneByNameReq) returns (EnterpriseInfo);
 
     rpc InsertXa (EnterpriseInfo) returns (InsertResp);
