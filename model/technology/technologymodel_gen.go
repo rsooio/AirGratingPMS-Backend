@@ -22,15 +22,15 @@ var (
 	technologyRowsExpectAutoSet   = strings.Join(stringx.Remove(technologyFieldNames, "`id`", "`create_time`", "`update_time`"), ",")
 	technologyRowsWithPlaceHolder = strings.Join(stringx.Remove(technologyFieldNames, "`id`", "`create_time`", "`update_time`"), "=?,") + "=?"
 
-	cacheTechnologyIdPrefix   = "cache:technology:id:"
-	cacheTechnologyNamePrefix = "cache:technology:name:"
+	cacheTechnologyIdPrefix                         = "cache:technology:id:"
+	cacheTechnologyEnterpriseIdWorkshopIdNamePrefix = "cache:technology:enterpriseId:workshopId:name:"
 )
 
 type (
 	technologyModel interface {
 		Insert(ctx context.Context, data *Technology) (sql.Result, error)
 		FindOne(ctx context.Context, id int64) (*Technology, error)
-		FindOneByName(ctx context.Context, name string) (*Technology, error)
+		FindOneByEnterpriseIdWorkshopIdName(ctx context.Context, enterpriseId int64, workshopId int64, name string) (*Technology, error)
 		Update(ctx context.Context, data *Technology) error
 		Delete(ctx context.Context, id int64) error
 	}
@@ -41,15 +41,15 @@ type (
 	}
 
 	Technology struct {
-		Id           int64          `db:"id"`
-		EnterpriseId int64          `db:"enterprise_id"`
-		WorkshopId   int64          `db:"workshop_id"`
-		Name         string         `db:"name"`
-		Info         sql.NullString `db:"info"`
-		CreateTime   time.Time      `db:"create_time"`
-		UpdateTime   time.Time      `db:"update_time"`
-		Remark       sql.NullString `db:"remark"`
-		Version      int64          `db:"version"`
+		Id           int64     `db:"id"`
+		EnterpriseId int64     `db:"enterprise_id"`
+		WorkshopId   int64     `db:"workshop_id"`
+		Name         string    `db:"name"`
+		Info         string    `db:"info"`
+		CreateTime   time.Time `db:"create_time"`
+		UpdateTime   time.Time `db:"update_time"`
+		Remark       string    `db:"remark"`
+		Version      int64     `db:"version"`
 	}
 )
 
@@ -61,12 +61,12 @@ func newTechnologyModel(conn sqlx.SqlConn, c cache.CacheConf) *defaultTechnology
 }
 
 func (m *defaultTechnologyModel) Insert(ctx context.Context, data *Technology) (sql.Result, error) {
+	technologyEnterpriseIdWorkshopIdNameKey := fmt.Sprintf("%s%v:%v:%v", cacheTechnologyEnterpriseIdWorkshopIdNamePrefix, data.EnterpriseId, data.WorkshopId, data.Name)
 	technologyIdKey := fmt.Sprintf("%s%v", cacheTechnologyIdPrefix, data.Id)
-	technologyNameKey := fmt.Sprintf("%s%v", cacheTechnologyNamePrefix, data.Name)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?)", m.table, technologyRowsExpectAutoSet)
 		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.Name, data.Info, data.Remark, data.Version)
-	}, technologyIdKey, technologyNameKey)
+	}, technologyEnterpriseIdWorkshopIdNameKey, technologyIdKey)
 	return ret, err
 }
 
@@ -87,12 +87,12 @@ func (m *defaultTechnologyModel) FindOne(ctx context.Context, id int64) (*Techno
 	}
 }
 
-func (m *defaultTechnologyModel) FindOneByName(ctx context.Context, name string) (*Technology, error) {
-	technologyNameKey := fmt.Sprintf("%s%v", cacheTechnologyNamePrefix, name)
+func (m *defaultTechnologyModel) FindOneByEnterpriseIdWorkshopIdName(ctx context.Context, enterpriseId int64, workshopId int64, name string) (*Technology, error) {
+	technologyEnterpriseIdWorkshopIdNameKey := fmt.Sprintf("%s%v:%v:%v", cacheTechnologyEnterpriseIdWorkshopIdNamePrefix, enterpriseId, workshopId, name)
 	var resp Technology
-	err := m.QueryRowIndexCtx(ctx, &resp, technologyNameKey, m.formatPrimary, func(ctx context.Context, conn sqlx.SqlConn, v interface{}) (i interface{}, e error) {
-		query := fmt.Sprintf("select %s from %s where `name` = ? limit 1", technologyRows, m.table)
-		if err := conn.QueryRowCtx(ctx, &resp, query, name); err != nil {
+	err := m.QueryRowIndexCtx(ctx, &resp, technologyEnterpriseIdWorkshopIdNameKey, m.formatPrimary, func(ctx context.Context, conn sqlx.SqlConn, v interface{}) (i interface{}, e error) {
+		query := fmt.Sprintf("select %s from %s where `enterprise_id` = ? and `workshop_id` = ? and `name` = ? limit 1", technologyRows, m.table)
+		if err := conn.QueryRowCtx(ctx, &resp, query, enterpriseId, workshopId, name); err != nil {
 			return nil, err
 		}
 		return resp.Id, nil
@@ -108,12 +108,12 @@ func (m *defaultTechnologyModel) FindOneByName(ctx context.Context, name string)
 }
 
 func (m *defaultTechnologyModel) Update(ctx context.Context, data *Technology) error {
+	technologyEnterpriseIdWorkshopIdNameKey := fmt.Sprintf("%s%v:%v:%v", cacheTechnologyEnterpriseIdWorkshopIdNamePrefix, data.EnterpriseId, data.WorkshopId, data.Name)
 	technologyIdKey := fmt.Sprintf("%s%v", cacheTechnologyIdPrefix, data.Id)
-	technologyNameKey := fmt.Sprintf("%s%v", cacheTechnologyNamePrefix, data.Name)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, technologyRowsWithPlaceHolder)
 		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.Name, data.Info, data.Remark, data.Version, data.Id)
-	}, technologyIdKey, technologyNameKey)
+	}, technologyEnterpriseIdWorkshopIdNameKey, technologyIdKey)
 	return err
 }
 
@@ -123,12 +123,12 @@ func (m *defaultTechnologyModel) Delete(ctx context.Context, id int64) error {
 		return err
 	}
 
+	technologyEnterpriseIdWorkshopIdNameKey := fmt.Sprintf("%s%v:%v:%v", cacheTechnologyEnterpriseIdWorkshopIdNamePrefix, data.EnterpriseId, data.WorkshopId, data.Name)
 	technologyIdKey := fmt.Sprintf("%s%v", cacheTechnologyIdPrefix, id)
-	technologyNameKey := fmt.Sprintf("%s%v", cacheTechnologyNamePrefix, data.Name)
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
 		return conn.ExecCtx(ctx, query, id)
-	}, technologyIdKey, technologyNameKey)
+	}, technologyEnterpriseIdWorkshopIdNameKey, technologyIdKey)
 	return err
 }
 

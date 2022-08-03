@@ -1,0 +1,104 @@
+syntax = "v1"
+
+info(
+	title: Technology Module
+	desc: Everything about Technology
+	author: rsooio
+	email: risin@risin.work
+	version: 1.0
+)
+
+type (
+	InsertTechnologyReq {
+		WorkshopId int64  `json:"workshop_id"`
+		Name       string `json:"name"`
+		Info       string `json:"info,optional"`
+		Remark     string `json:"remark,optional"`
+	}
+
+	InsertTechnologyReply {
+		Id      int64  `json:"id"`
+		Message string `json:"message"`
+	}
+
+	DeleteTechnologyReq {
+		Id int64 `json:"id"`
+	}
+
+	DeleteTechnologyReply {
+		Message string `json:"message"`
+	}
+
+	UpdateTechnologyReq {
+		Id         int64  `json:"id"`
+		WorkshopId int64  `json:"workshop_id,optional"`
+		Name       string `json:"name,optional"`
+		Info       string `json:"info,optional"`
+		Remark     string `json:"remark,optional"`
+	}
+
+	UpdateTechnologyReply {
+		Message       string   `json:"message"`
+		ChangedFields []string `json:"changed_fields"`
+	}
+
+	GetTechnologyInfoByIdReq {
+		Id int64 `json:"id"`
+	}
+
+	TechnologyInfo {
+		Id         int64  `json:"id"`
+		WorkshopId int64  `json:"workshop_id"`
+		Name       string `json:"name"`
+		Info       string `json:"info"`
+		Remark     string `json:"remark"`
+		Version    int64  `json:"version"`
+	}
+
+	GetTechnologyListByWorkshopReq {
+		WorkshopId int64 `json:"workshop_id,optional"`
+		PageNumber int32 `json:"pn"`
+		PageSize   int32 `json:"ps"`
+	}
+
+	GetTechnologyListByWorkshopReply {
+		Message        string           `json:"message"`
+		Count          int64            `json:"count"`
+		TechnologyList []TechnologyInfo `json:"technology_list"`
+	}
+
+	GetTechnologyListByEnterpriseReq {
+		PageNumber int32 `json:"pn"`
+		PageSize   int32 `json:"ps"`
+	}
+
+	GetTechnologyListByEnterpriseReply {
+		Message        string           `json:"message"`
+		Count          int64            `json:"count"`
+		TechnologyList []TechnologyInfo `json:"technology_list"`
+	}
+)
+
+@server(
+	jwt: Auth
+	group: technology
+)
+service technology-api {
+	@handler InsertTechnology
+	post /technology (InsertTechnologyReq) returns (InsertTechnologyReply)
+	
+	@handler DeleteTechnology
+	delete /technology (DeleteTechnologyReq) returns (DeleteTechnologyReply)
+	
+	@handler UpdateTechnology
+	patch /technology (UpdateTechnologyReq) returns (UpdateTechnologyReply)
+	
+	@handler GetTechnologyInfoById
+	get /technology (GetTechnologyInfoByIdReq) returns (TechnologyInfo)
+	
+	@handler GetTechnologyListByWorkshop
+	get /workshop/technology (GetTechnologyListByWorkshopReq) returns (GetTechnologyListByWorkshopReply)
+	
+	@handler GetTechnologyListByEnterprise
+	get /enterprise/technology (GetTechnologyListByEnterpriseReq) returns (GetTechnologyListByEnterpriseReply)
+}
