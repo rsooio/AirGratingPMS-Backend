@@ -41,16 +41,16 @@ type (
 	}
 
 	UnitPrice struct {
-		Id           int64          `db:"id"`
-		EnterpriseId int64          `db:"enterprise_id"`
-		WorkshopId   int64          `db:"workshop_id"`
-		TechnologyId int64          `db:"technology_id"`
-		ClientId     int64          `db:"client_id"`
-		UnitPrice    float64        `db:"unit_price"`
-		CreateTime   time.Time      `db:"create_time"`
-		UpdateTime   time.Time      `db:"update_time"`
-		Remark       sql.NullString `db:"remark"`
-		Version      int64          `db:"version"`
+		Id           int64     `db:"id"`
+		EnterpriseId int64     `db:"enterprise_id"`
+		WorkshopId   int64     `db:"workshop_id"`
+		TechnologyId int64     `db:"technology_id"`
+		ClientId     int64     `db:"client_id"`
+		UnitPrice    float64   `db:"unit_price"`
+		CreateTime   time.Time `db:"create_time"`
+		UpdateTime   time.Time `db:"update_time"`
+		Remark       string    `db:"remark"`
+		Version      int64     `db:"version"`
 	}
 )
 

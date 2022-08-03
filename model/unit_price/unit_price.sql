@@ -12,7 +12,7 @@ CREATE TABLE `unit_price` (
     `unit_price` DECIMAL(6,2) NOT NULL,
     `create_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     `update_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `remark` VARCHAR(300),
+    `remark` VARCHAR(300) NOT NULL DEFAULT "",
         -- FULLTEXT INDEX `remark_fulltext_index`(`remark`),
     `version` INT NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

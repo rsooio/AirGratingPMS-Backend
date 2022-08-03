@@ -39,15 +39,15 @@ type (
 	}
 
 	ProductionPlan struct {
-		Id             int64          `db:"id"`
-		EnterpriseId   int64          `db:"enterprise_id"`
-		WorkshopId     int64          `db:"workshop_id"`
-		ProductionTime time.Time      `db:"production_time"`
-		State          int64          `db:"state"`
-		CreateTime     time.Time      `db:"create_time"`
-		UpdateTime     time.Time      `db:"update_time"`
-		Remark         sql.NullString `db:"remark"`
-		Version        int64          `db:"version"`
+		Id             int64     `db:"id"`
+		EnterpriseId   int64     `db:"enterprise_id"`
+		WorkshopId     int64     `db:"workshop_id"`
+		ProductionTime time.Time `db:"production_time"`
+		State          int64     `db:"state"`
+		CreateTime     time.Time `db:"create_time"`
+		UpdateTime     time.Time `db:"update_time"`
+		Remark         string    `db:"remark"`
+		Version        int64     `db:"version"`
 	}
 )
 

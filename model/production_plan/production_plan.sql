@@ -9,7 +9,7 @@ CREATE TABLE `production_plan` (
         -- INDEX `state_index`(`state`),
     `create_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     `update_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `remark` VARCHAR(300),
+    `remark` VARCHAR(300) NOT NULL DEFAULT "",
         -- FULLTEXT INDEX `remark_fulltext_index`(`remark`),
     `version` INT NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
