@@ -6,7 +6,7 @@ import (
 
 type ProductSetList []*ProductSet
 
-func (m ProductSet) Rpc() *pb.ProductSetInfo {
+func (m *ProductSet) Rpc() *pb.ProductSetInfo {
 	return &pb.ProductSetInfo{
 		Id:      m.Id,
 		OrderId: m.OrderId,
@@ -14,9 +14,9 @@ func (m ProductSet) Rpc() *pb.ProductSetInfo {
 	}
 }
 
-func (m ProductSetList) RpcList() *[]*pb.ProductSetInfo {
+func (m *ProductSetList) RpcList() *[]*pb.ProductSetInfo {
 	var ret []*pb.ProductSetInfo
-	for _, i := range m {
+	for _, i := range *m {
 		ret = append(ret, i.Rpc())
 	}
 	return &ret

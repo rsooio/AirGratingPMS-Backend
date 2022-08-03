@@ -1,6 +1,7 @@
 package order
 
 import (
+	"air-grating-pms-backend/utils/partial"
 	"context"
 	"database/sql"
 	"fmt"
@@ -15,8 +16,9 @@ import (
 var _ OrderModel = (*customOrderModel)(nil)
 
 var (
-	cacheOrderEnterpriseListCount = "cache:order:enterprise:list:count"
-	orderRowsWithPrefixA          = "a." + strings.Join(orderFieldNames, ",a.")
+	cacheOrderWorkshopListCountPrefix   = "cache:order:workshop:list:count:"
+	cacheOrderEnterpriseListCountPrefix = "cache:order:enterprise:list:count:"
+	orderRowsWithPrefixA                = "a." + strings.Join(orderFieldNames, ",a.")
 )
 
 type (
@@ -26,6 +28,7 @@ type (
 		orderModel
 		Insert(ctx context.Context, data *Order) (sql.Result, error)
 		Delete(ctx context.Context, id int64) error
+		Update(ctx context.Context, data *Order) error
 		FindListByEnterprise(ctx context.Context, enterpriseId int64, offset, limit int32) (OrderList, int64, error)
 		FindListByWorkshop(ctx context.Context, enterpriseId int64, workshopId int64, offset, limit int32) (OrderList, int64, error)
 	}
@@ -42,18 +45,50 @@ func NewOrderModel(conn sqlx.SqlConn, c cache.CacheConf) OrderModel {
 	}
 }
 
+func cacheOrderWorkshopListCountKey(enterpriseId, workshopId int64) string {
+	return fmt.Sprintf("%s%v:%v", cacheOrderWorkshopListCountPrefix, enterpriseId, workshopId)
+}
+
+func cacheOrderEnterpriseListCountKey(enterpriseId int64) string {
+	return fmt.Sprintf("%s%v", cacheOrderEnterpriseListCountPrefix, enterpriseId)
+}
+
 func (m *customOrderModel) Insert(ctx context.Context, data *Order) (sql.Result, error) {
-	m.DelCacheCtx(ctx, cacheOrderEnterpriseListCount)
-	return m.defaultOrderModel.Insert(ctx, data)
+	orderIdKey := fmt.Sprintf("%s%v", cacheOrderIdPrefix, data.Id)
+	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, orderRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.ClientId, data.ProductionPlanId, data.State, data.Address, data.Linkman, data.PhoneNumber, data.Email, data.CorrespondingCode, data.Remark, data.Version)
+	}, orderIdKey, cacheOrderEnterpriseListCountKey(data.EnterpriseId), cacheOrderWorkshopListCountKey(data.EnterpriseId, data.WorkshopId))
+	return ret, err
 }
 
 func (m *customOrderModel) Delete(ctx context.Context, id int64) error {
-	m.DelCacheCtx(ctx, cacheOrderEnterpriseListCount)
-	return m.defaultOrderModel.Delete(ctx, id)
+	data, err := m.FindOne(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	orderIdKey := fmt.Sprintf("%s%v", cacheOrderIdPrefix, id)
+	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
+		return conn.ExecCtx(ctx, query, id)
+	}, orderIdKey, cacheOrderEnterpriseListCountKey(data.EnterpriseId), cacheOrderWorkshopListCountKey(data.EnterpriseId, data.WorkshopId))
+	return err
+}
+
+func (m *customOrderModel) Update(ctx context.Context, data *Order) error {
+	rows, args := partial.Partial(data)
+
+	orderIdKey := fmt.Sprintf("%s%v", cacheOrderIdPrefix, data.Id)
+	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, rows.StringWithPlaceHolder())
+		return conn.ExecCtx(ctx, query, *args.WithId(data.Id)...)
+	}, orderIdKey)
+	return err
 }
 
 func (m *customOrderModel) FindListByEnterprise(ctx context.Context, enterpriseId int64, offset, limit int32) (OrderList, int64, error) {
-	resp := make([]*Order, 0)
+	resp := make(OrderList, 0)
 	var count int64
 
 	err := mr.Finish(func() error {
@@ -69,7 +104,7 @@ func (m *customOrderModel) FindListByEnterprise(ctx context.Context, enterpriseI
 		return nil
 	}, func() error {
 		query := fmt.Sprintf("SELECT count(*) FROM %s WHERE `enterprise_id` = ?", m.table)
-		return m.QueryRow(&count, cacheOrderEnterpriseListCount, func(conn sqlx.SqlConn, v interface{}) error {
+		return m.QueryRow(&count, cacheOrderEnterpriseListCountKey(enterpriseId), func(conn sqlx.SqlConn, v interface{}) error {
 			return conn.QueryRowCtx(ctx, v, query, enterpriseId)
 		})
 	})
@@ -78,7 +113,7 @@ func (m *customOrderModel) FindListByEnterprise(ctx context.Context, enterpriseI
 }
 
 func (m *customOrderModel) FindListByWorkshop(ctx context.Context, enterpriseId int64, workshopId int64, offset, limit int32) (OrderList, int64, error) {
-	resp := make([]*Order, 0)
+	resp := make(OrderList, 0)
 	var count int64
 
 	err := mr.Finish(func() error {
@@ -94,7 +129,7 @@ func (m *customOrderModel) FindListByWorkshop(ctx context.Context, enterpriseId 
 		return nil
 	}, func() error {
 		query := fmt.Sprintf("SELECT count(*) FROM %s WHERE `enterprise_id` = ? AND `workshop_id` = ?", m.table)
-		return m.QueryRow(&count, cacheOrderEnterpriseListCount, func(conn sqlx.SqlConn, v interface{}) error {
+		return m.QueryRow(&count, cacheOrderWorkshopListCountKey(enterpriseId, workshopId), func(conn sqlx.SqlConn, v interface{}) error {
 			return conn.QueryRowCtx(ctx, v, query, enterpriseId, workshopId)
 		})
 	})

@@ -6,9 +6,14 @@ import (
 	"strings"
 )
 
-func Partial(in any) ([]string, []any) {
-	args := []any{}
-	rows := []string{}
+type (
+	rowList []string
+	argList []any
+)
+
+func Partial(in any) (rowList, argList) {
+	args := argList{}
+	rows := rowList{}
 
 	v := reflect.ValueOf(in)
 	if v.Kind() == reflect.Ptr {
@@ -47,6 +52,11 @@ func Partial(in any) ([]string, []any) {
 	return rows, args
 }
 
-func RowsWithPlaceHolder(rows []string) string {
-	return strings.Join(rows, "=?,") + "=?"
+func (m *argList) WithId(id int64) *argList {
+	args := append(*m, id)
+	return &args
+}
+
+func (m *rowList) StringWithPlaceHolder() string {
+	return strings.Join(*m, "=?,") + "=?"
 }

@@ -17,3 +17,10 @@ func GetStafferId(ctx context.Context) int64 {
 func GetRole(ctx context.Context) string {
 	return ctx.Value("rol").(string)
 }
+
+func SelectWorkshopId(ctx context.Context, input int64) int64 {
+	if GetRole(ctx) != "boss" {
+		return GetWorkshopId(ctx)
+	}
+	return input
+}

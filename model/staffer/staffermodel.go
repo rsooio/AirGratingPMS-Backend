@@ -54,8 +54,13 @@ func cacheStafferWorkshopListCountKey(enterpriseId, workshopId int64) string {
 }
 
 func (m *customStafferModel) Insert(ctx context.Context, data *Staffer) (sql.Result, error) {
-	m.DelCacheCtx(ctx, cacheStafferEnterpriseListCountKey(data.EnterpriseId), cacheStafferWorkshopListCountKey(data.EnterpriseId, data.WorkshopId))
-	return m.defaultStafferModel.Insert(ctx, data)
+	stafferEnterpriseIdUsernameKey := fmt.Sprintf("%s%v:%v", cacheStafferEnterpriseIdUsernamePrefix, data.EnterpriseId, data.Username)
+	stafferIdKey := fmt.Sprintf("%s%v", cacheStafferIdPrefix, data.Id)
+	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, stafferRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.Username, data.Role, data.Name, data.HashedPassword, data.Gender, data.PhoneNumber, data.Email, data.Address, data.ExpireTime, data.Remark, data.Version)
+	}, stafferEnterpriseIdUsernameKey, stafferIdKey, cacheStafferEnterpriseListCountKey(data.EnterpriseId), cacheStafferWorkshopListCountKey(data.EnterpriseId, data.WorkshopId))
+	return ret, err
 }
 
 func (m *customStafferModel) Update(ctx context.Context, data *Staffer) error {
@@ -63,8 +68,8 @@ func (m *customStafferModel) Update(ctx context.Context, data *Staffer) error {
 
 	productIdKey := fmt.Sprintf("%s%v", cacheStafferIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, partial.RowsWithPlaceHolder(rows))
-		return conn.ExecCtx(ctx, query, append(args, data.Id)...)
+		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, rows.StringWithPlaceHolder())
+		return conn.ExecCtx(ctx, query, *args.WithId(data.Id)...)
 	}, productIdKey)
 	return err
 }
@@ -75,13 +80,12 @@ func (m *customStafferModel) Delete(ctx context.Context, id int64) error {
 		return err
 	}
 
-	m.DelCacheCtx(ctx, cacheStafferEnterpriseListCountKey(data.EnterpriseId), cacheStafferWorkshopListCountKey(data.EnterpriseId, data.WorkshopId))
 	stafferEnterpriseIdUsernameKey := fmt.Sprintf("%s%v:%v", cacheStafferEnterpriseIdUsernamePrefix, data.EnterpriseId, data.Username)
 	stafferIdKey := fmt.Sprintf("%s%v", cacheStafferIdPrefix, id)
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
 		return conn.ExecCtx(ctx, query, id)
-	}, stafferEnterpriseIdUsernameKey, stafferIdKey)
+	}, stafferEnterpriseIdUsernameKey, stafferIdKey, cacheStafferEnterpriseListCountKey(data.EnterpriseId), cacheStafferWorkshopListCountKey(data.EnterpriseId, data.WorkshopId))
 	return err
 }
 

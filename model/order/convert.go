@@ -6,7 +6,7 @@ import (
 
 type OrderList []*Order
 
-func (m Order) Rpc() *pb.OrderInfo {
+func (m *Order) Rpc() *pb.OrderInfo {
 	return &pb.OrderInfo{
 		Id:                m.Id,
 		EnterpriseId:      m.EnterpriseId,
@@ -23,9 +23,9 @@ func (m Order) Rpc() *pb.OrderInfo {
 	}
 }
 
-func (m OrderList) RpcList() *[]*pb.OrderInfo {
+func (m *OrderList) RpcList() *[]*pb.OrderInfo {
 	var ret []*pb.OrderInfo
-	for _, i := range m {
+	for _, i := range *m {
 		ret = append(ret, i.Rpc())
 	}
 	return &ret
