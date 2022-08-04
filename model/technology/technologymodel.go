@@ -66,12 +66,22 @@ func (m *customTechnologyModel) Insert(ctx context.Context, data *Technology) (s
 func (m *customTechnologyModel) Update(ctx context.Context, data *Technology) error {
 	rows, args := partial.Partial(data)
 
-	technologyEnterpriseIdWorkshopIdNameKey := fmt.Sprintf("%s%v:%v:%v", cacheTechnologyEnterpriseIdWorkshopIdNamePrefix, data.EnterpriseId, data.WorkshopId, data.Name)
 	technologyIdKey := fmt.Sprintf("%s%v", cacheTechnologyIdPrefix, data.Id)
+	technologyEnterpriseIdWorkshopIdNameKey := fmt.Sprintf("%s%v:%v:%v", cacheTechnologyEnterpriseIdWorkshopIdNamePrefix, data.EnterpriseId, data.WorkshopId, data.Name)
+	keys := []string{technologyIdKey, technologyEnterpriseIdWorkshopIdNameKey}
+	if data.WorkshopId != 0 || data.EnterpriseId != 0 {
+		info, err := m.FindOne(ctx, data.Id)
+		if err != nil {
+			return err
+		}
+
+		keys = append(*partial.UpdateKeys2x1_12(data.EnterpriseId, data.WorkshopId, info.EnterpriseId, info.WorkshopId, cacheTechnologyEnterpriseListCountKey, cacheTechnologyWorkshopListCountKey), keys...)
+	}
+
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, rows.StringWithPlaceHolder())
 		return conn.ExecCtx(ctx, query, *args.WithId(data.Id)...)
-	}, technologyEnterpriseIdWorkshopIdNameKey, technologyIdKey, cacheTechnologyEnterpriseListCountKey(data.EnterpriseId), cacheTechnologyWorkshopListCountKey(data.EnterpriseId, data.WorkshopId))
+	}, keys...)
 	return err
 }
 

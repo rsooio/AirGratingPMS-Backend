@@ -44,7 +44,7 @@ func NewProductSetModel(conn sqlx.SqlConn, c cache.CacheConf) ProductSetModel {
 	}
 }
 
-func cacheProductSetOrderListKey(orderId int64) string {
+func cacheProductSetOrderListCountKey(orderId int64) string {
 	return fmt.Sprintf("%s%v", cacheProductSetOrderListCountPrefix, orderId)
 }
 
@@ -53,7 +53,7 @@ func (m *customProductSetModel) Insert(ctx context.Context, data *ProductSet) (s
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, productSetRowsExpectAutoSet)
 		return conn.ExecCtx(ctx, query, data.OrderId, data.Remark, data.Version)
-	}, productSetIdKey, cacheProductSetOrderListKey(data.OrderId))
+	}, productSetIdKey, cacheProductSetOrderListCountKey(data.OrderId))
 	return ret, err
 }
 
@@ -67,18 +67,27 @@ func (m *customProductSetModel) Delete(ctx context.Context, id int64) error {
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
 		return conn.ExecCtx(ctx, query, id)
-	}, productSetIdKey, cacheProductSetOrderListKey(data.OrderId))
+	}, productSetIdKey, cacheProductSetOrderListCountKey(data.OrderId))
 	return err
 }
 
 func (m *customProductSetModel) Update(ctx context.Context, data *ProductSet) error {
 	rows, args := partial.Partial(data)
 
-	productSetIdKey := fmt.Sprintf("%s%v", cacheProductSetIdPrefix, data.Id)
+	keys := []string{fmt.Sprintf("%s%v", cacheProductSetIdPrefix, data.Id)}
+	if data.OrderId != 0 {
+		info, err := m.FindOne(ctx, data.Id)
+		if err != nil {
+			return err
+		}
+
+		keys = append(*partial.UpdateKeys1x1(data.OrderId, info.OrderId, cacheProductSetOrderListCountKey), keys...)
+	}
+
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, rows.StringWithPlaceHolder())
 		return conn.ExecCtx(ctx, query, *args.WithId(data.Id)...)
-	}, productSetIdKey)
+	}, keys...)
 	return err
 }
 
@@ -99,7 +108,7 @@ func (m *customProductSetModel) FindListByOrderId(ctx context.Context, orderId i
 		return nil
 	}, func() error {
 		query := fmt.Sprintf("SELECT count(*) FROM %s WHERE `order_id` = ?", m.table)
-		return m.QueryRow(&count, cacheProductSetOrderListKey(orderId), func(conn sqlx.SqlConn, v interface{}) error {
+		return m.QueryRow(&count, cacheProductSetOrderListCountKey(orderId), func(conn sqlx.SqlConn, v interface{}) error {
 			return conn.QueryRowCtx(ctx, v, query, orderId)
 		})
 	})

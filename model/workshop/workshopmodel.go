@@ -77,10 +77,20 @@ func (m *customWorkshopModel) Update(ctx context.Context, data *Workshop) error 
 
 	workshopEnterpriseIdNameKey := fmt.Sprintf("%s%v:%v", cacheWorkshopEnterpriseIdNamePrefix, data.EnterpriseId, data.Name)
 	workshopIdKey := fmt.Sprintf("%s%v", cacheWorkshopIdPrefix, data.Id)
+	keys := []string{workshopEnterpriseIdNameKey, workshopIdKey}
+	if data.EnterpriseId != 0 {
+		info, err := m.FindOne(ctx, data.Id)
+		if err != nil {
+			return err
+		}
+
+		keys = append(*partial.UpdateKeys1x1(data.EnterpriseId, info.EnterpriseId, cacheWorkshopEnterpriseListCountKey), keys...)
+	}
+
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, rows.StringWithPlaceHolder())
 		return conn.ExecCtx(ctx, query, *args.WithId(data.Id)...)
-	}, workshopEnterpriseIdNameKey, workshopIdKey)
+	}, keys...)
 	return err
 }
 

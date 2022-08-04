@@ -73,11 +73,20 @@ func (m *customProductModel) Delete(ctx context.Context, id int64) error {
 func (m *customProductModel) Update(ctx context.Context, data *Product) error {
 	rows, args := partial.Partial(data)
 
-	productIdKey := fmt.Sprintf("%s%v", cacheProductIdPrefix, data.Id)
+	keys := []string{fmt.Sprintf("%s%v", cacheProductIdPrefix, data.Id)}
+	if data.ProductSetId != 0 {
+		info, err := m.FindOne(ctx, data.Id)
+		if err != nil {
+			return err
+		}
+
+		keys = append(*partial.UpdateKeys1x1(data.ProductSetId, info.ProductSetId, cacheProductProductSetListCountKey), keys...)
+	}
+
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, rows.StringWithPlaceHolder())
 		return conn.ExecCtx(ctx, query, *args.WithId(data.Id)...)
-	}, productIdKey)
+	}, keys...)
 	return err
 }
 

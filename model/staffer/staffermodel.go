@@ -66,11 +66,20 @@ func (m *customStafferModel) Insert(ctx context.Context, data *Staffer) (sql.Res
 func (m *customStafferModel) Update(ctx context.Context, data *Staffer) error {
 	rows, args := partial.Partial(data)
 
-	productIdKey := fmt.Sprintf("%s%v", cacheStafferIdPrefix, data.Id)
+	keys := []string{fmt.Sprintf("%s%v", cacheStafferIdPrefix, data.Id)}
+	if data.WorkshopId != 0 || data.EnterpriseId != 0 {
+		info, err := m.FindOne(ctx, data.Id)
+		if err != nil {
+			return err
+		}
+
+		keys = append(*partial.UpdateKeys2x1_12(data.EnterpriseId, data.WorkshopId, info.EnterpriseId, info.WorkshopId, cacheStafferEnterpriseListCountKey, cacheStafferWorkshopListCountKey), keys...)
+	}
+
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, rows.StringWithPlaceHolder())
 		return conn.ExecCtx(ctx, query, *args.WithId(data.Id)...)
-	}, productIdKey)
+	}, keys...)
 	return err
 }
 
