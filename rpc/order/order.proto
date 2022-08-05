@@ -13,6 +13,8 @@ service order {
     rpc FindOneById (FindOneByIdReq) returns (OrderInfo);
     rpc FindListByWorkshop (FindListByWorkshopReq) returns (OrderList);
     rpc FindListByEnterprise (FindListByEnterpriseReq) returns (OrderList);
+    rpc FindListByProductionPlan (FindListByProductionPlanReq) returns (OrderList);
+    rpc UpdateStateByProductionId (UpdateStateByProductionIdReq) returns (Empty);
 
     // rpc InsertXa (OrderInfo) returns (InsertResp);
 }
@@ -62,7 +64,19 @@ message FindListByEnterpriseReq {
     int32 PageNumber   = 3;
 }
 
+message FindListByProductionPlanReq {
+    int64 ProductionPlanId = 1;
+    int32 PageSize         = 2;
+    int32 PageNumber       = 3;
+}
+
 message OrderList {
     int64              Count = 1;
     repeated OrderInfo List  = 2;
+}
+
+message UpdateStateByProductionIdReq {
+    int64 OldState         = 1;
+    int64 NewState         = 2;
+    int64 ProductionPlanId = 3;
 }

@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package production_plan;
+option go_package="./pb";
+
+message Empty {}
+
+service production_plan {
+    rpc Insert (ProductionPlanInfo) returns (InsertResp);
+    rpc Delete (DeleteReq) returns (Empty);
+    rpc Update (ProductionPlanInfo) returns (Empty);
+    rpc FindOneById (FindOneByIdReq) returns (ProductionPlanInfo);
+    rpc FindListByWorkshop (FindListByWorkshopReq) returns (ProductionPlanList);
+    rpc FindListByEnterprise (FindListByEnterpriseReq) returns (ProductionPlanList);
+}
+
+message ProductionPlanInfo {
+    int64  Id                = 1;
+    int64  EnterpriseId      = 2;
+    int64  WorkshopId        = 3;
+    int64  State             = 4;
+    string Remark            = 5;
+    int64  Version           = 6;
+}
+
+message InsertResp {
+    int64 Id = 1;
+}
+
+message DeleteReq {
+    int64 Id = 1;
+}
+
+message FindOneByIdReq {
+    int64 Id = 1;
+}
+
+message FindListByWorkshopReq {
+    int64 EnterpriseId = 1;
+    int64 WorkshopId   = 2;
+    int32 PageSize     = 3;
+    int32 PageNumber   = 4;
+}
+
+message FindListByEnterpriseReq {
+    int64 EnterpriseId = 1;
+    int32 PageSize     = 2;
+    int32 PageNumber   = 3;
+}
+
+message ProductionPlanList {
+    int64                       Count = 1;
+    repeated ProductionPlanInfo List  = 2;
+}

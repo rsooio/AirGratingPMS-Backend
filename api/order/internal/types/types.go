@@ -77,6 +77,18 @@ type GetOrderListByWorkshopReply struct {
 	OrderList []OrderInfo `json:"order_list"`
 }
 
+type GetOrderListByProductionPlanReq struct {
+	ProductionPlanId int64 `json:"pid"`
+	PageNumber       int32 `json:"pn"`
+	PageSize         int32 `json:"ps"`
+}
+
+type GetOrderListByProductionPlanReply struct {
+	Message     string      `json:"message"`
+	Count       int64       `json:"count"`
+	ProductList []OrderInfo `json:"product_list"`
+}
+
 type InsertProductSetReq struct {
 	OrderId int64  `json:"order_id"`
 	Remark  string `json:"remark"`
@@ -161,12 +173,6 @@ type UpdateProductReply struct {
 	ChangedFields []string `json:"changed_fields"`
 }
 
-type GetProductListByProductSetReq struct {
-	ProductSetId int64 `json:"product_set_id"`
-	PageNumber   int32 `json:"pn"`
-	PageSize     int32 `json:"ps"`
-}
-
 type ProductInfo struct {
 	Id           int64  `json:"id"`
 	ProductSetId int64  `json:"product_set_id"`
@@ -176,6 +182,12 @@ type ProductInfo struct {
 	UnitPrice    string `json:"unit_price"`
 	Quantity     int64  `json:"quantity"`
 	Remark       string `json:"remark"`
+}
+
+type GetProductListByProductSetReq struct {
+	ProductSetId int64 `json:"product_set_id"`
+	PageNumber   int32 `json:"pn"`
+	PageSize     int32 `json:"ps"`
 }
 
 type GetProductListByProductSetReply struct {

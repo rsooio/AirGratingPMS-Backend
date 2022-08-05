@@ -24,3 +24,10 @@ func SelectWorkshopId(ctx context.Context, input int64) int64 {
 	}
 	return input
 }
+
+func ZeroSelectWorkshopId(ctx context.Context, input int64) int64 {
+	if GetRole(ctx) != "boss" {
+		return 0
+	}
+	return input
+}

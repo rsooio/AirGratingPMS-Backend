@@ -13,15 +13,17 @@ import (
 )
 
 type (
-	DeleteReq               = pb.DeleteReq
-	Empty                   = pb.Empty
-	FindListByEnterpriseReq = pb.FindListByEnterpriseReq
-	FindListByWorkshopReq   = pb.FindListByWorkshopReq
-	FindOneByIdReq          = pb.FindOneByIdReq
-	FindOneByNameReq        = pb.FindOneByNameReq
-	InsertResp              = pb.InsertResp
-	OrderInfo               = pb.OrderInfo
-	OrderList               = pb.OrderList
+	DeleteReq                    = pb.DeleteReq
+	Empty                        = pb.Empty
+	FindListByEnterpriseReq      = pb.FindListByEnterpriseReq
+	FindListByProductionPlanReq  = pb.FindListByProductionPlanReq
+	FindListByWorkshopReq        = pb.FindListByWorkshopReq
+	FindOneByIdReq               = pb.FindOneByIdReq
+	FindOneByNameReq             = pb.FindOneByNameReq
+	InsertResp                   = pb.InsertResp
+	OrderInfo                    = pb.OrderInfo
+	OrderList                    = pb.OrderList
+	UpdateStateByProductionIdReq = pb.UpdateStateByProductionIdReq
 
 	Order interface {
 		Insert(ctx context.Context, in *OrderInfo, opts ...grpc.CallOption) (*InsertResp, error)
@@ -31,6 +33,8 @@ type (
 		FindOneById(ctx context.Context, in *FindOneByIdReq, opts ...grpc.CallOption) (*OrderInfo, error)
 		FindListByWorkshop(ctx context.Context, in *FindListByWorkshopReq, opts ...grpc.CallOption) (*OrderList, error)
 		FindListByEnterprise(ctx context.Context, in *FindListByEnterpriseReq, opts ...grpc.CallOption) (*OrderList, error)
+		FindListByProductionPlan(ctx context.Context, in *FindListByProductionPlanReq, opts ...grpc.CallOption) (*OrderList, error)
+		UpdateStateByProductionId(ctx context.Context, in *UpdateStateByProductionIdReq, opts ...grpc.CallOption) (*Empty, error)
 	}
 
 	defaultOrder struct {
@@ -73,4 +77,14 @@ func (m *defaultOrder) FindListByWorkshop(ctx context.Context, in *FindListByWor
 func (m *defaultOrder) FindListByEnterprise(ctx context.Context, in *FindListByEnterpriseReq, opts ...grpc.CallOption) (*OrderList, error) {
 	client := pb.NewOrderClient(m.cli.Conn())
 	return client.FindListByEnterprise(ctx, in, opts...)
+}
+
+func (m *defaultOrder) FindListByProductionPlan(ctx context.Context, in *FindListByProductionPlanReq, opts ...grpc.CallOption) (*OrderList, error) {
+	client := pb.NewOrderClient(m.cli.Conn())
+	return client.FindListByProductionPlan(ctx, in, opts...)
+}
+
+func (m *defaultOrder) UpdateStateByProductionId(ctx context.Context, in *UpdateStateByProductionIdReq, opts ...grpc.CallOption) (*Empty, error) {
+	client := pb.NewOrderClient(m.cli.Conn())
+	return client.UpdateStateByProductionId(ctx, in, opts...)
 }

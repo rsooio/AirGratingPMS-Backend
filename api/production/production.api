@@ -1,0 +1,151 @@
+syntax = "v1"
+
+info(
+	title: Production Module
+	desc: Everything about Production
+	author: rsooio
+	email: risin@risin.work
+	version: 1.0
+)
+
+type (
+	InsertProductionPlanReq {
+		WorkshopId int64  `json:"workshop_id,optional"`
+		Remark     string `json:"remark,optional"`
+	}
+
+	InsertProductionPlanReply {
+		Id      int64  `json:"id"`
+		Message string `json:"message"`
+	}
+
+	DeleteProductionPlanReq {
+		Id int64 `json:"id"`
+	}
+
+	DeleteProductionPlanReply {
+		Message string `json:"message"`
+	}
+
+	UpdateProductionPlanReq {
+		Id         int64  `json:"id"`
+		WorkshopId int64  `json:"workshop_id,optional"`
+		Remark     string `json:"remark,optional"`
+	}
+
+	UpdateProductionPlanReply {
+		Message string `json:"message"`
+	}
+
+	GetProductionPlanInfoByIdReq {
+		Id int64 `json:"id"`
+	}
+
+	ProductionPlanInfo {
+		Id         int64  `json:"id"`
+		WorkshopId int64  `json:"workshop_id"`
+		State      int64  `json:"state"`
+		Remark     string `json:"remark"`
+		Version    int64  `json:"version"`
+	}
+
+	GetProductionPlanListByEnterpriseReq {
+		PageNumber int32 `json:"pn"`
+		PageSize   int32 `json:"ps"`
+	}
+
+	GetProductionPlanListByEnterpriseReply {
+		Message string               `json:"message"`
+		Count   int64                `json:"count"`
+		List    []ProductionPlanInfo `json:"list"`
+	}
+
+	GetProductionPlanListByWorkshopReq {
+		WorkshopId int64 `json:"workshop_id"`
+		PageNumber int32 `json:"pn"`
+		PageSize   int32 `json:"ps"`
+	}
+
+	GetProductionPlanListByWorkshopReply {
+		Message string               `json:"message"`
+		Count   int64                `json:"count"`
+		List    []ProductionPlanInfo `json:"list"`
+	}
+
+	StartProductionPlanReq {
+		Id int64 `json:"id"`
+	}
+
+	StartProductionPlanReply {
+		Message string `json:"message"`
+	}
+
+	CompleteProductionPlanReq {
+		Id int64 `json:"id"`
+	}
+
+	CompleteProductionPlanReply {
+		Message string `json:"message"`
+	}
+)
+
+@server(
+	jwt: Auth
+	group: production_plan
+)
+service production-api {
+	@handler InsertProductionPlan
+	post /production-plan (InsertProductionPlanReq) returns (InsertProductionPlanReply)
+	
+	@handler DeleteProductionPlan
+	delete /production-plan (DeleteProductionPlanReq) returns (DeleteProductionPlanReply)
+	
+	@handler UpdateProductionPlan
+	patch /production-plan (UpdateProductionPlanReq) returns (UpdateProductionPlanReply)
+	
+	@handler GetProductionPlanInfoById
+	get /production-plan (GetProductionPlanInfoByIdReq) returns (ProductionPlanInfo)
+	
+	@handler GetProductionPlanListByEnterprise
+	get /enterprise/production-plan (GetProductionPlanListByEnterpriseReq) returns (GetProductionPlanListByEnterpriseReply)
+	
+	@handler GetProductionPlanListByWorkshop
+	get /workshop/production-plan (GetProductionPlanListByWorkshopReq) returns (GetProductionPlanListByWorkshopReply)
+	
+	@handler StartProductionPlan
+	post /production-plan/start (StartProductionPlanReq) returns (StartProductionPlanReply)
+	
+	@handler CompleteProductionPlan
+	post /production-plan/done (CompleteProductionPlanReq) returns (CompleteProductionPlanReply)
+}
+
+type (
+	CompleteOrderProductionReq {
+		Id int64 `json:"id"`
+	}
+
+	CompleteOrderProductionReply {
+		Message string `json:"message"`
+	}
+
+	SetOrderProductionPlanReq {
+		Id               int64 `json:"id"`
+		ProductionPlanId int64 `json:"pid"`
+	}
+
+	SetOrderProductionPlanReply {
+		Message string `json:"message"`
+	}
+)
+
+@server(
+	jwt: Auth
+	group: order
+)
+service production-api {
+	@handler CompleteOrderProduction
+	post /order/production (CompleteOrderProductionReq) returns (CompleteOrderProductionReply)
+	
+	@handler SetOrderProductionPlan
+	post /order/plan (SetOrderProductionPlanReq) returns (SetOrderProductionPlanReply)
+}

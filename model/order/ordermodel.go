@@ -16,9 +16,10 @@ import (
 var _ OrderModel = (*customOrderModel)(nil)
 
 var (
-	cacheOrderWorkshopListCountPrefix   = "cache:order:workshop:list:count:"
-	cacheOrderEnterpriseListCountPrefix = "cache:order:enterprise:list:count:"
-	orderRowsWithPrefixA                = "a." + strings.Join(orderFieldNames, ",a.")
+	cacheOrderWorkshopListCountPrefix       = "cache:order:workshop:list:count:"
+	cacheOrderEnterpriseListCountPrefix     = "cache:order:enterprise:list:count:"
+	cacheOrderProductionPlanListCountPrefix = "cache:order:production_plan:list:count:"
+	orderRowsWithPrefixA                    = "a." + strings.Join(orderFieldNames, ",a.")
 )
 
 type (
@@ -31,6 +32,8 @@ type (
 		Update(ctx context.Context, data *Order) error
 		FindListByEnterprise(ctx context.Context, enterpriseId int64, offset, limit int32) (OrderList, int64, error)
 		FindListByWorkshop(ctx context.Context, enterpriseId int64, workshopId int64, offset, limit int32) (OrderList, int64, error)
+		FindListByProductionPlan(ctx context.Context, productionPlanId int64, offset, limit int32) (OrderList, int64, error)
+		UpdateStateByProductionId(ctx context.Context, productionPlanId, oldState, newState int64) error
 	}
 
 	customOrderModel struct {
@@ -53,12 +56,21 @@ func cacheOrderEnterpriseListCountKey(enterpriseId int64) string {
 	return fmt.Sprintf("%s%v", cacheOrderEnterpriseListCountPrefix, enterpriseId)
 }
 
+func cacheOrderProductionPlanListCountKey(productionPlanId int64) string {
+	return fmt.Sprintf("%s%v", cacheOrderProductionPlanListCountPrefix, productionPlanId)
+}
+
 func (m *customOrderModel) Insert(ctx context.Context, data *Order) (sql.Result, error) {
 	orderIdKey := fmt.Sprintf("%s%v", cacheOrderIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, orderRowsExpectAutoSet)
 		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.ClientId, data.ProductionPlanId, data.State, data.Address, data.Linkman, data.PhoneNumber, data.Email, data.CorrespondingCode, data.Remark, data.Version)
-	}, orderIdKey, cacheOrderEnterpriseListCountKey(data.EnterpriseId), cacheOrderWorkshopListCountKey(data.EnterpriseId, data.WorkshopId))
+	},
+		orderIdKey,
+		cacheOrderEnterpriseListCountKey(data.EnterpriseId),
+		cacheOrderWorkshopListCountKey(data.EnterpriseId, data.WorkshopId),
+		cacheOrderProductionPlanListCountKey(data.ProductionPlanId),
+	)
 	return ret, err
 }
 
@@ -72,7 +84,12 @@ func (m *customOrderModel) Delete(ctx context.Context, id int64) error {
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("delete from %s where `id` = ?", m.table)
 		return conn.ExecCtx(ctx, query, id)
-	}, orderIdKey, cacheOrderEnterpriseListCountKey(data.EnterpriseId), cacheOrderWorkshopListCountKey(data.EnterpriseId, data.WorkshopId))
+	},
+		orderIdKey,
+		cacheOrderEnterpriseListCountKey(data.EnterpriseId),
+		cacheOrderWorkshopListCountKey(data.EnterpriseId, data.WorkshopId),
+		cacheOrderProductionPlanListCountKey(data.ProductionPlanId),
+	)
 	return err
 }
 
@@ -80,13 +97,14 @@ func (m *customOrderModel) Update(ctx context.Context, data *Order) error {
 	rows, args := partial.Partial(data)
 
 	keys := []string{fmt.Sprintf("%s%v", cacheOrderIdPrefix, data.Id)}
-	if data.WorkshopId != 0 || data.EnterpriseId != 0 {
+	if data.WorkshopId != 0 || data.EnterpriseId != 0 || data.ProductionPlanId != 0 {
 		info, err := m.FindOne(ctx, data.Id)
 		if err != nil {
 			return err
 		}
 
 		keys = append(*partial.UpdateKeys2x1_12(data.EnterpriseId, data.WorkshopId, info.EnterpriseId, info.WorkshopId, cacheOrderEnterpriseListCountKey, cacheOrderWorkshopListCountKey), keys...)
+		keys = append(keys, *partial.UpdateKeys1x1(data.ProductionPlanId, info.ProductionPlanId, cacheOrderProductionPlanListCountKey)...)
 	}
 
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
@@ -144,4 +162,50 @@ func (m *customOrderModel) FindListByWorkshop(ctx context.Context, enterpriseId 
 	})
 
 	return resp, count, err
+}
+
+func (m *customOrderModel) FindListByProductionPlan(ctx context.Context, productionPlanId int64, offset, limit int32) (OrderList, int64, error) {
+	resp := make(OrderList, 0)
+	var count int64
+
+	err := mr.Finish(func() error {
+		query := fmt.Sprintf("SELECT %s FROM %s AS a INNER JOIN (SELECT `id` FROM %s WHERE `production_plan_id` = ? LIMIT ?, ?) AS b ON a.id = b.id", orderRowsWithPrefixA, m.table, m.table)
+		err := m.QueryRowsNoCacheCtx(ctx, &resp, query, productionPlanId, offset, limit)
+		if err != nil {
+			logx.Errorf("orderProductionPlanId.findList error, productionPlanId=%d, offset=%d, limit=%d, err=%s", productionPlanId, offset, limit, err.Error())
+			if err == sqlx.ErrNotFound {
+				return ErrNotFound
+			}
+			return err
+		}
+		return nil
+	}, func() error {
+		query := fmt.Sprintf("SELECT count(*) FROM %s WHERE `production_plan_id` = ?", m.table)
+		return m.QueryRow(&count, cacheOrderProductionPlanListCountKey(productionPlanId), func(conn sqlx.SqlConn, v interface{}) error {
+			return conn.QueryRowCtx(ctx, v, query, productionPlanId)
+		})
+	})
+
+	return resp, count, err
+}
+
+func (m *customOrderModel) UpdateStateByProductionId(ctx context.Context, productionPlanId, oldState, newState int64) error {
+	var resp []int64
+	query := fmt.Sprintf("select `id` from %s where `production_plan_id` = ? and `state` = ?", m.table)
+	err := m.QueryRowsNoCacheCtx(ctx, &resp, query, productionPlanId, oldState)
+	if err != nil {
+		return err
+	}
+
+	var keys []string
+	for _, i := range resp {
+		keys = append(keys, m.formatPrimary(i))
+	}
+
+	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (sql.Result, error) {
+		query := fmt.Sprintf("update %s set `state` = ? where `production_plan_id` = ? and `state` = ?", m.table)
+		return conn.ExecCtx(ctx, query, newState, productionPlanId, oldState)
+	}, keys...)
+
+	return err
 }

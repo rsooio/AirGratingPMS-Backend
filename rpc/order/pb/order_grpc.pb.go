@@ -29,6 +29,8 @@ type OrderClient interface {
 	FindOneById(ctx context.Context, in *FindOneByIdReq, opts ...grpc.CallOption) (*OrderInfo, error)
 	FindListByWorkshop(ctx context.Context, in *FindListByWorkshopReq, opts ...grpc.CallOption) (*OrderList, error)
 	FindListByEnterprise(ctx context.Context, in *FindListByEnterpriseReq, opts ...grpc.CallOption) (*OrderList, error)
+	FindListByProductionPlan(ctx context.Context, in *FindListByProductionPlanReq, opts ...grpc.CallOption) (*OrderList, error)
+	UpdateStateByProductionId(ctx context.Context, in *UpdateStateByProductionIdReq, opts ...grpc.CallOption) (*Empty, error)
 }
 
 type orderClient struct {
@@ -93,6 +95,24 @@ func (c *orderClient) FindListByEnterprise(ctx context.Context, in *FindListByEn
 	return out, nil
 }
 
+func (c *orderClient) FindListByProductionPlan(ctx context.Context, in *FindListByProductionPlanReq, opts ...grpc.CallOption) (*OrderList, error) {
+	out := new(OrderList)
+	err := c.cc.Invoke(ctx, "/order.order/FindListByProductionPlan", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *orderClient) UpdateStateByProductionId(ctx context.Context, in *UpdateStateByProductionIdReq, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/order.order/UpdateStateByProductionId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OrderServer is the server API for Order service.
 // All implementations must embed UnimplementedOrderServer
 // for forward compatibility
@@ -104,6 +124,8 @@ type OrderServer interface {
 	FindOneById(context.Context, *FindOneByIdReq) (*OrderInfo, error)
 	FindListByWorkshop(context.Context, *FindListByWorkshopReq) (*OrderList, error)
 	FindListByEnterprise(context.Context, *FindListByEnterpriseReq) (*OrderList, error)
+	FindListByProductionPlan(context.Context, *FindListByProductionPlanReq) (*OrderList, error)
+	UpdateStateByProductionId(context.Context, *UpdateStateByProductionIdReq) (*Empty, error)
 	mustEmbedUnimplementedOrderServer()
 }
 
@@ -128,6 +150,12 @@ func (UnimplementedOrderServer) FindListByWorkshop(context.Context, *FindListByW
 }
 func (UnimplementedOrderServer) FindListByEnterprise(context.Context, *FindListByEnterpriseReq) (*OrderList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FindListByEnterprise not implemented")
+}
+func (UnimplementedOrderServer) FindListByProductionPlan(context.Context, *FindListByProductionPlanReq) (*OrderList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindListByProductionPlan not implemented")
+}
+func (UnimplementedOrderServer) UpdateStateByProductionId(context.Context, *UpdateStateByProductionIdReq) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateStateByProductionId not implemented")
 }
 func (UnimplementedOrderServer) mustEmbedUnimplementedOrderServer() {}
 
@@ -250,6 +278,42 @@ func _Order_FindListByEnterprise_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Order_FindListByProductionPlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindListByProductionPlanReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServer).FindListByProductionPlan(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/order.order/FindListByProductionPlan",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServer).FindListByProductionPlan(ctx, req.(*FindListByProductionPlanReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Order_UpdateStateByProductionId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateStateByProductionIdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServer).UpdateStateByProductionId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/order.order/UpdateStateByProductionId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServer).UpdateStateByProductionId(ctx, req.(*UpdateStateByProductionIdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Order_ServiceDesc is the grpc.ServiceDesc for Order service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -280,6 +344,14 @@ var Order_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FindListByEnterprise",
 			Handler:    _Order_FindListByEnterprise_Handler,
+		},
+		{
+			MethodName: "FindListByProductionPlan",
+			Handler:    _Order_FindListByProductionPlan_Handler,
+		},
+		{
+			MethodName: "UpdateStateByProductionId",
+			Handler:    _Order_UpdateStateByProductionId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -40,6 +40,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Path:    "/workshop/order",
 				Handler: order.GetOrderListByWorkshopHandler(serverCtx),
 			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/production-plan/order",
+				Handler: order.GetOrderListByProductionPlanHandler(serverCtx),
+			},
 		},
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 	)

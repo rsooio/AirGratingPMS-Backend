@@ -84,6 +84,18 @@ type (
 		Count     int64       `json:"count"`
 		OrderList []OrderInfo `json:"order_list"`
 	}
+
+	GetOrderListByProductionPlanReq {
+		ProductionPlanId int64 `json:"pid"`
+		PageNumber       int32 `json:"pn"`
+		PageSize         int32 `json:"ps"`
+	}
+
+	GetOrderListByProductionPlanReply {
+		Message     string      `json:"message"`
+		Count       int64       `json:"count"`
+		ProductList []OrderInfo `json:"product_list"`
+	}
 )
 
 @server(
@@ -105,6 +117,9 @@ service order-api {
 	
 	@handler GetOrderListByWorkshop
 	get /workshop/order (GetOrderListByWorkshopReq) returns(GetOrderListByWorkshopReply)
+	
+	@handler GetOrderListByProductionPlan
+	get /production-plan/order (GetOrderListByProductionPlanReq) returns (GetOrderListByProductionPlanReply)
 }
 
 type (
@@ -212,12 +227,6 @@ type (
 		ChangedFields []string `json:"changed_fields"`
 	}
 
-	GetProductListByProductSetReq {
-		ProductSetId int64 `json:"product_set_id"`
-		PageNumber   int32 `json:"pn"`
-		PageSize     int32 `json:"ps"`
-	}
-
 	ProductInfo {
 		Id           int64  `json:"id"`
 		ProductSetId int64  `json:"product_set_id"`
@@ -227,6 +236,12 @@ type (
 		UnitPrice    string `json:"unit_price"`
 		Quantity     int64  `json:"quantity"`
 		Remark       string `json:"remark"`
+	}
+
+	GetProductListByProductSetReq {
+		ProductSetId int64 `json:"product_set_id"`
+		PageNumber   int32 `json:"pn"`
+		PageSize     int32 `json:"ps"`
 	}
 
 	GetProductListByProductSetReply {

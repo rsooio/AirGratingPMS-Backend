@@ -52,3 +52,13 @@ func (s *OrderServer) FindListByEnterprise(ctx context.Context, in *pb.FindListB
 	l := logic.NewFindListByEnterpriseLogic(ctx, s.svcCtx)
 	return l.FindListByEnterprise(in)
 }
+
+func (s *OrderServer) FindListByProductionPlan(ctx context.Context, in *pb.FindListByProductionPlanReq) (*pb.OrderList, error) {
+	l := logic.NewFindListByProductionPlanLogic(ctx, s.svcCtx)
+	return l.FindListByProductionPlan(in)
+}
+
+func (s *OrderServer) UpdateStateByProductionId(ctx context.Context, in *pb.UpdateStateByProductionIdReq) (*pb.Empty, error) {
+	l := logic.NewUpdateStateByProductionIdLogic(ctx, s.svcCtx)
+	return l.UpdateStateByProductionId(in)
+}

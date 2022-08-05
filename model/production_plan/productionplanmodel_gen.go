@@ -39,15 +39,14 @@ type (
 	}
 
 	ProductionPlan struct {
-		Id             int64     `db:"id"`
-		EnterpriseId   int64     `db:"enterprise_id"`
-		WorkshopId     int64     `db:"workshop_id"`
-		ProductionTime time.Time `db:"production_time"`
-		State          int64     `db:"state"`
-		CreateTime     time.Time `db:"create_time"`
-		UpdateTime     time.Time `db:"update_time"`
-		Remark         string    `db:"remark"`
-		Version        int64     `db:"version"`
+		Id           int64     `db:"id"`
+		EnterpriseId int64     `db:"enterprise_id"`
+		WorkshopId   int64     `db:"workshop_id"`
+		State        int64     `db:"state"`
+		CreateTime   time.Time `db:"create_time"`
+		UpdateTime   time.Time `db:"update_time"`
+		Remark       string    `db:"remark"`
+		Version      int64     `db:"version"`
 	}
 )
 
@@ -61,8 +60,8 @@ func newProductionPlanModel(conn sqlx.SqlConn, c cache.CacheConf) *defaultProduc
 func (m *defaultProductionPlanModel) Insert(ctx context.Context, data *ProductionPlan) (sql.Result, error) {
 	productionPlanIdKey := fmt.Sprintf("%s%v", cacheProductionPlanIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?)", m.table, productionPlanRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.ProductionTime, data.State, data.Remark, data.Version)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?)", m.table, productionPlanRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.State, data.Remark, data.Version)
 	}, productionPlanIdKey)
 	return ret, err
 }
@@ -88,7 +87,7 @@ func (m *defaultProductionPlanModel) Update(ctx context.Context, data *Productio
 	productionPlanIdKey := fmt.Sprintf("%s%v", cacheProductionPlanIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, productionPlanRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.ProductionTime, data.State, data.Remark, data.Version, data.Id)
+		return conn.ExecCtx(ctx, query, data.EnterpriseId, data.WorkshopId, data.State, data.Remark, data.Version, data.Id)
 	}, productionPlanIdKey)
 	return err
 }

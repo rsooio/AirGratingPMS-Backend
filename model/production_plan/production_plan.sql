@@ -4,7 +4,6 @@ CREATE TABLE `production_plan` (
     `enterprise_id` INT NOT NULL,
     `workshop_id` INT NOT NULL,
         INDEX `workshop_id_index`(`enterprise_id`, `workshop_id`),
-    `production_time` TIMESTAMP NOT NULL,
     `state` INT NOT NULL DEFAULT 0,
         -- INDEX `state_index`(`state`),
     `create_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
