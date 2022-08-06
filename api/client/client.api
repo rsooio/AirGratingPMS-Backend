@@ -1,0 +1,141 @@
+syntax = "v1"
+
+info(
+	title: Client Module
+	desc: Everything about CLient
+	author: rsooio
+	email: risin@risin.work
+	version: 1.0
+)
+
+type (
+	InsertClientReq {
+		WorkshopId  int64  `json:"workshop_id,optional"`
+		Name        string `json:"name"`
+		PhoneNumber string `json:"phone_number,optional"`
+		Email       string `json:"email,optional"`
+		Address     string `json:"address,optional"`
+		Remark      string `json:"remark,optional"`
+	}
+
+	InsertClientReply {
+		Id      int64  `json:"id"`
+		Message string `json:"message"`
+	}
+
+	DeleteCientReq {
+		Id int64 `json:"id"`
+	}
+
+	DeleteCientReply {
+		Message string `json:"message"`
+	}
+
+	UpdateClientReq {
+		Id          int64  `json:"id"`
+		WorkshopId  int64  `json:"workshop_id,optional"`
+		Name        string `json:"name,optional"`
+		PhoneNumber string `json:"phone_number,optional"`
+		Email       string `json:"email,optional"`
+		Address     string `json:"address,optional"`
+		Remark      string `json:"remark,optional"`
+	}
+
+	UpdateClientReply {
+		Message string `json:"message"`
+	}
+
+	GetClientInfoByIdReq {
+		Id int64 `json:"id"`
+	}
+
+	ClientInfo {
+		Id          int64  `json:"id"`
+		WorkshopId  int64  `json:"workshop_id"`
+		Name        string `json:"name"`
+		PhoneNumber string `json:"phone_number"`
+		Email       string `json:"email"`
+		Address     string `json:"address"`
+		Remark      string `json:"remark"`
+		Version     int64  `json:"version"`
+	}
+
+	GetClientListByWorkshopReq {
+		WorkshopId int64 `json:"workshop_id"`
+		PageNumber int32 `json:"pn"`
+		PageSize   int32 `json:"ps"`
+	}
+
+	GetClientListByWorkshopReply {
+		Count   int64        `json:"count"`
+		List    []ClientInfo `json:"list"`
+		Message string       `json:"message"`
+	}
+
+	GetClientListByEnterpriseReq {
+		PageNumber int32 `json:"pn"`
+		PageSize   int32 `json:"ps"`
+	}
+
+	GetClientListByEnterpriseReply {
+		Count   int64        `json:"count"`
+		List    []ClientInfo `json:"list"`
+		Message string       `json:"message"`
+	}
+)
+
+@server(
+	jwt: Auth
+	group: client
+)
+service client-api {
+	@handler InsertClient
+	post /client (InsertClientReq) returns (InsertClientReply)
+	
+	@handler DeleteCient
+	delete /client (DeleteCientReq) returns (DeleteCientReply)
+	
+	@handler UpdateClient
+	patch /client (UpdateClientReq) returns (UpdateClientReply)
+	
+	@handler GetClientInfoById
+	get /client (GetClientInfoByIdReq) returns (ClientInfo)
+	
+	@handler GetClientListByWorkshop
+	get /workshop/client (GetClientListByWorkshopReq) returns (GetClientListByWorkshopReply)
+	
+	@handler GetClientListByEnterprise
+	get /enterprise/client (GetClientListByEnterpriseReq) returns (GetClientListByEnterpriseReply)
+}
+
+type (
+	SetUnitPriceByClientReq {
+		ClientId     int64           `json:"client_id"`
+		UnitPriceMap map[int64]int64 `json:"unit_price_map"`
+	}
+
+	SetUnitPriceByClientReply {
+		Message string `json:"message"`
+	}
+
+	GetUnitPriceByClientReq {
+		ClientId int64 `json:"client_id"`
+	}
+
+	GetUnitPriceByClientReply {
+		Message      string          `json:"message"`
+		UnitPriceMap map[int64]int64 `json:"unit_price_map"`
+	}
+)
+
+@server(
+	jwt: Auth
+	group: unit_price
+)
+service client-api {
+	@handler SetUnitPriceByClient
+	patch /unit-price (SetUnitPriceByClientReq) returns (SetUnitPriceByClientReply)
+	
+	@handler GetUnitPriceByClient
+	get /unit-price (GetUnitPriceByClientReq) returns (GetUnitPriceByClientReply)
+}
