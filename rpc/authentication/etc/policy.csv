@@ -3,8 +3,8 @@ g, manager, employee
 g, boss, manager
 
 p, unknown, /staffer/login, POST
-p, unknown, /enterprise, PUT
 p, unknown, /enterprise, POST
+p, unknown, /enterprise, GET
 
 p, employee, /staffer, PUT
 p, employee, /staffer, PATCH

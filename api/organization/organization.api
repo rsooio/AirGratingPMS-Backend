@@ -142,7 +142,12 @@ service organization-api {
 	
 	@handler DeleteEnterprise
 	delete /enterprise (DeleteEnterpriseReq) returns(DeleteEnterpriseReply)
-	
+}
+
+@server(
+	group: enterprise
+)
+service organization-api {
 	@handler GetEnterpriseIdByName
 	get /enterprise (GetEnterpriseIdByNameReq) returns(GetEnterpriseIdByNameReply)
 }

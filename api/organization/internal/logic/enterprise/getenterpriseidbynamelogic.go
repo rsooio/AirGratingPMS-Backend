@@ -29,7 +29,11 @@ func (l *GetEnterpriseIdByNameLogic) GetEnterpriseIdByName(req *types.GetEnterpr
 		Username: req.Name,
 	})
 
+	if err != nil {
+		return nil, err
+	}
+
 	return &types.GetEnterpriseIdByNameReply{
 		Id: info.Id,
-	}, err
+	}, nil
 }
