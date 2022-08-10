@@ -31,3 +31,17 @@ func ZeroSelectWorkshopId(ctx context.Context, input int64) int64 {
 	}
 	return input
 }
+
+func SelectErrorCode(ctxs ...context.Context) int {
+	if len(ctxs) == 0 {
+		return -1
+	}
+	if code, ok := ctxs[0].Value("errCode").(int); ok && code != 0 {
+		return code
+	}
+	return -1
+}
+
+func SetErrorCode(ctx context.Context, code int) context.Context {
+	return context.WithValue(ctx, "errCode", code)
+}

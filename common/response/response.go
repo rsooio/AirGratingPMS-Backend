@@ -1,8 +1,9 @@
 package response
 
 import (
+	"air-grating-pms-backend/utils"
+	"context"
 	"net/http"
-	"strconv"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
@@ -13,22 +14,11 @@ type Body struct {
 	Data interface{} `json:"data,omitempty"`
 }
 
-func Response(w http.ResponseWriter, resp interface{}, err error) {
+func Response(w http.ResponseWriter, resp interface{}, err error, ctxs ...context.Context) {
 	var body Body
 	if err != nil {
-		if len(err.Error()) >= 4 && err.Error()[0] == '#' && err.Error()[3] == '#' {
-			code, err := strconv.Atoi(err.Error()[1:3])
-			if err != nil {
-				body.Code = -1
-				body.Msg = err.Error()
-			} else {
-				body.Code = code
-				body.Msg = err.Error()[4:]
-			}
-		} else {
-			body.Code = -1
-			body.Msg = err.Error()
-		}
+		body.Code = utils.SelectErrorCode(ctxs...)
+		body.Msg = err.Error()
 	} else {
 		body.Msg = "OK"
 		body.Data = resp
